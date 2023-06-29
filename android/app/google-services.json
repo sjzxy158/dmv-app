@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "583902623028",
+    "project_id": "dmv-test-pro-dec47",
+    "storage_bucket": "dmv-test-pro-dec47.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:583902623028:android:fa14010e99e7ffa29c2161",
+        "android_client_info": {
+          "package_name": "com.dmv.app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "583902623028-36jdra02fngs1b3t9kf6r1nsdsb31t0t.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA_fd2IdlZkYLuhqpPOAcvfa8DfpeJSi3g"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "583902623028-36jdra02fngs1b3t9kf6r1nsdsb31t0t.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "583902623028-at5l6nj1p1f45qb2bjc2rmp3bojdsrk1.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.app"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
