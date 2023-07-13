@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:app/page/home.dart';
 import 'package:flutter/material.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -69,7 +70,7 @@ class _StartPage extends State<StartPage> {
                   children: <Widget>[
                     Container(
                       margin: EdgeInsets.fromLTRB(0, 36, 0, 0),
-                      // margin: const EdgeInsets.only(top: 36),
+                      // margin: const EdgeInsets.only(top: 36)
                       alignment: Alignment.center,
                       child: AdWidget(ad: _ad!),
                     ),
@@ -83,25 +84,26 @@ class _StartPage extends State<StartPage> {
                             // return WebView(
                             //   initialUrl: 'https://www.dmv-test-pro.com',
                             // );
-                            return MaterialApp(
-                              title: 'Welcome to DMV',
-                              theme: ThemeData(
-                                  primarySwatch: Colors.green,
-                                  primaryColor: Colors.white),
-                              routes: {
-                                "/": (_) => WebviewScaffold(
-                                    // url: "https://www.menuwithnutrition.com/",
-                                    // url: "https://dmv.silversiri.com",
-                                    url: "https://www.dmv-test-pro.com",
-                                    appBar: PreferredSize(
-                                        // child: AppBar(), preferredSize: const Size.fromHeight(0.0))),
-                                        child: AppBar(
-                                          backgroundColor: Colors.white,
-                                        ),
-                                        preferredSize: Size.fromHeight(0.0))),
-                              },
-                              debugShowCheckedModeBanner: false,
-                            );
+                            return HomePage();
+                            // return MaterialApp(
+                            //   title: 'Welcome to DMV',
+                            //   theme: ThemeData(
+                            //       primarySwatch: Colors.green,
+                            //       primaryColor: Colors.white),
+                            //   routes: {
+                            //     "/": (_) => WebviewScaffold(
+                            //         // url: "https://www.menuwithnutrition.com/",
+                            //         // url: "https://dmv.silversiri.com",
+                            //         url: "https://www.dmv-test-pro.com",
+                            //         appBar: PreferredSize(
+                            //             // child: AppBar(), preferredSize: const Size.fromHeight(0.0))),
+                            //             child: AppBar(
+                            //               backgroundColor: Colors.white,
+                            //             ),
+                            //             preferredSize: Size.fromHeight(0.0))),
+                            //   },
+                            //   debugShowCheckedModeBanner: false,
+                            // );
                           }));
                         },
                         child: SizedBox(
@@ -150,26 +152,27 @@ class _StartPage extends State<StartPage> {
                                   // return WebView(
                                   //   initialUrl: 'https://www.dmv-test-pro.com',
                                   // );
-                                  return MaterialApp(
-                                    title: 'Welcome to DMV',
-                                    theme: ThemeData(
-                                        primarySwatch: Colors.green,
-                                        primaryColor: Colors.white),
-                                    routes: {
-                                      "/": (_) => WebviewScaffold(
-                                          // url: "https://www.menuwithnutrition.com/",
-                                          // url: "https://dmv.silversiri.com",
-                                          url: "https://www.dmv-test-pro.com",
-                                          appBar: PreferredSize(
-                                              // child: AppBar(), preferredSize: const Size.fromHeight(0.0))),
-                                              child: AppBar(
-                                                backgroundColor: Colors.white,
-                                              ),
-                                              preferredSize:
-                                                  Size.fromHeight(0.0))),
-                                    },
-                                    debugShowCheckedModeBanner: false,
-                                  );
+                                  return HomePage();
+                                  // return MaterialApp(
+                                  //   title: 'Welcome to DMV',
+                                  //   theme: ThemeData(
+                                  //       primarySwatch: Colors.green,
+                                  //       primaryColor: Colors.white),
+                                  //   routes: {
+                                  //     "/": (_) => WebviewScaffold(
+                                  //         // url: "https://www.menuwithnutrition.com/",
+                                  //         // url: "https://dmv.silversiri.com",
+                                  //         url: "https://www.dmv-test-pro.com",
+                                  //         appBar: PreferredSize(
+                                  //             // child: AppBar(), preferredSize: const Size.fromHeight(0.0))),
+                                  //             child: AppBar(
+                                  //               backgroundColor: Colors.white,
+                                  //             ),
+                                  //             preferredSize:
+                                  //                 Size.fromHeight(0.0))),
+                                  //   },
+                                  //   debugShowCheckedModeBanner: false,
+                                  // );
                                 }));
                               }
                               if (_ad != null) {
