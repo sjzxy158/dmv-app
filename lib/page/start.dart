@@ -1,6 +1,7 @@
 import 'dart:io';
 
-import 'package:app/page/home.dart';
+import 'package:app/page/state_list.dart';
+import 'package:app/page/type.dart';
 import 'package:flutter/material.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -84,7 +85,8 @@ class _StartPage extends State<StartPage> {
                             // return WebView(
                             //   initialUrl: 'https://www.dmv-test-pro.com',
                             // );
-                            return HomePage();
+                            return StateListPage();
+                            // return TypeSelectPage();
                             // return MaterialApp(
                             //   title: 'Welcome to DMV',
                             //   theme: ThemeData(
@@ -136,7 +138,7 @@ class _StartPage extends State<StartPage> {
                 const Text('DMV Test Pro',
                     style: TextStyle(
                       fontSize: 18,
-                      fontFamily: 'GoogleSans',
+                      fontFamily: 'GoogleSans-Regular',
                     )),
                 const Spacer(),
                 Container(
@@ -152,7 +154,8 @@ class _StartPage extends State<StartPage> {
                                   // return WebView(
                                   //   initialUrl: 'https://www.dmv-test-pro.com',
                                   // );
-                                  return HomePage();
+                                  return StateListPage();
+                                  // return TypeSelectPage();
                                   // return MaterialApp(
                                   //   title: 'Welcome to DMV',
                                   //   theme: ThemeData(
