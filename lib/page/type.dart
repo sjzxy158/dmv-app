@@ -5,31 +5,38 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_webview_plugin/flutter_webview_plugin.dart';
 
 class TypeSelectPage extends StatefulWidget {
-  // final String stateAbbr;
-  // final String stateValue;
-  // final String stateSlug;
+  final int stateIndex;
+  final String stateAbbr;
+  final String stateValue;
+  final String stateSlug;
 
-  const TypeSelectPage({
-    Key? key,
-    // required this.stateAbbr,
-    // required this.stateValue,
-    // required this.stateSlug
-  }) : super(key: key);
+  const TypeSelectPage(
+      {Key? key,
+      required this.stateIndex,
+      required this.stateAbbr,
+      required this.stateValue,
+      required this.stateSlug})
+      : super(key: key);
 
   @override
   _TypeSelectPageState createState() => _TypeSelectPageState();
 }
 
+// String licence = '';
+// String licenceLower = '';
+
 class _TypeSelectPageState extends State<TypeSelectPage> {
-  // String stateAbbr = '';
-  // String stateValue = '';
-  // String stateSlug = '';
-  // @override
-  // void initState() {
-  //   stateAbbr = widget.stateAbbr;
-  //   stateValue = widget.stateValue;
-  //   stateSlug = widget.stateSlug;
-  // }
+  int stateIndex = -1;
+  String stateAbbr = '';
+  String stateValue = '';
+  String stateSlug = '';
+  @override
+  void initState() {
+    stateIndex = widget.stateIndex;
+    stateAbbr = widget.stateAbbr;
+    stateValue = widget.stateValue;
+    stateSlug = widget.stateSlug;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -48,30 +55,34 @@ class _TypeSelectPageState extends State<TypeSelectPage> {
               height: double.infinity,
               decoration: BoxDecoration(color: Color(0xffdddddd)),
               child: Column(children: <Widget>[
-                _typeItem('Car'),
-                _typeItem('Motocycle'),
-                _typeItem('CDL'),
+                _typeItem('Car', 0),
+                _typeItem('Motocycle', 1),
+                _typeItem('CDL', 2),
               ]),
             )));
   }
 
-  _typeItem(String type) {
-    String typeLower = type.toLowerCase();
+  _typeItem(String licence, int index) {
+    String licenceLower = licence.toLowerCase();
     return InkWell(
       onTap: () {
+        // 本地存储 licence
+        // 跳转
         // print(stateAbbr);
         // print(stateValue);
         // print(stateSlug);
-        // print(type);
-        // print(typeLower);
+        // print(licence);
+        // print(licenceLower);
         Navigator.push(context, MaterialPageRoute(builder: (context) {
           return testListPage(
-              // stateAbbr: 'AL',
-              // stateValue: 'Alabama',
-              // stateSlug: 'alabama',
-              // type: type,
-              // typeLower: typeLower,
-              );
+            stateIndex: stateIndex,
+            stateAbbr: stateAbbr,
+            stateValue: stateValue,
+            stateSlug: stateSlug,
+            licenceIndex: index,
+            licence: licence,
+            licenceLower: licenceLower,
+          );
         }));
       },
       child: Container(
@@ -93,7 +104,7 @@ class _TypeSelectPageState extends State<TypeSelectPage> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
                     Text(
-                      type,
+                      licence,
                       style: TextStyle(fontFamily: 'GoogleSans-Regular'),
                     ),
                     SvgPicture.asset('images/go.svg', width: 16)
@@ -103,7 +114,7 @@ class _TypeSelectPageState extends State<TypeSelectPage> {
               Image(
                   width: 160,
                   height: 160,
-                  image: AssetImage('images/$typeLower.png'))
+                  image: AssetImage('images/$licenceLower.png'))
             ],
           )),
     );

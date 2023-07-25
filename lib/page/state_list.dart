@@ -14,28 +14,30 @@ class StateListPage extends StatefulWidget {
 }
 
 List STATE_LIST = [
-  {"slug": 'alabama0', "value": 'Alabama0'},
-  {"slug": 'alabama1', "value": 'Alabama1'},
-  {"slug": 'alabama2', "value": 'Alabama2'},
-  {"slug": 'alabama3', "value": 'Alabama3'},
-  {"slug": 'alabama4', "value": 'Alabama4'},
-  {"slug": 'alabama4', "value": 'Alabama4'},
-  {"slug": 'alabama4', "value": 'Alabama4'},
-  {"slug": 'alabama4', "value": 'Alabama4'},
-  {"slug": 'alabama4', "value": 'Alabama4'},
-  {"slug": 'alabama4', "value": 'Alabama4'},
-  {"slug": 'alabama4', "value": 'Alabama4'},
-  {"slug": 'alabama4', "value": 'Alabama4'},
-  {"slug": 'alabama8', "value": 'Alabama8'},
-  {"slug": 'alabama8', "value": 'Alabama8'},
-  {"slug": 'alabama8', "value": 'Alabama8'},
-  {"slug": 'alabama6', "value": 'Alabama6'},
-  {"slug": 'alabama6', "value": 'Alabama6'},
-  {"slug": 'alabama6', "value": 'Alabama6'},
-  {"slug": 'alabama6', "value": 'Alabama6'},
+  {"id": '1', "slug": 'alabama0', "value": 'Alabama0'},
+  {"id": '2', "slug": 'alabama1', "value": 'Alabama1'},
+  {"id": '3', "slug": 'alabama2', "value": 'Alabama2'},
+  {"id": '4', "slug": 'alabama3', "value": 'Alabama3'},
+  {"id": '5', "slug": 'alabama', "value": 'Alabama'},
+  {"id": '6', "slug": 'alabama4', "value": 'Alabama4'},
+  {"id": '7', "slug": 'alabama4', "value": 'Alabama4'},
+  {"id": '8', "slug": 'alabama4', "value": 'Alabama4'},
+  {"id": '9', "slug": 'alabama4', "value": 'Alabama4'},
+  {"id": '10', "slug": 'alabama4', "value": 'Alabama4'},
+  {"id": '11', "slug": 'alabama4', "value": 'Alabama4'},
+  {"id": '12', "slug": 'alabama4', "value": 'Alabama4'},
+  {"id": '13', "slug": 'alabama8', "value": 'Alabama8'},
+  {"id": '14', "slug": 'alabama8', "value": 'Alabama8'},
+  {"id": '15', "slug": 'alabama8', "value": 'Alabama8'},
+  {"id": '16', "slug": 'alabama6', "value": 'Alabama6'},
+  {"id": '17', "slug": 'alabama6', "value": 'Alabama6'},
+  {"id": '18', "slug": 'alabama6', "value": 'Alabama6'},
+  {"id": '19', "slug": 'alabama6', "value": 'Alabama6'},
 ];
-
-String SELECT_STATE = '';
+int stateIndex = -1;
+String stateAbbr = '';
+String stateValue = '';
+String stateSlug = '';
 
 class _StateListPageState extends State<StateListPage> {
   bool _tipVisible = false;
@@ -70,10 +72,7 @@ class _StateListPageState extends State<StateListPage> {
                       child: Center(
                           child: InkWell(
                         onTap: () {
-                          // print(SELECT_STATE);
-
-                          if (SELECT_STATE == '') {
-                            print('请选择州');
+                          if (stateValue == '') {
                             setState(() {
                               _tipVisible = true;
                             });
@@ -87,13 +86,15 @@ class _StateListPageState extends State<StateListPage> {
                               }
                             });
                           } else {
+                            // 本地存储state
+                            // 跳转
                             Navigator.push(context,
                                 MaterialPageRoute(builder: (context) {
                               return TypeSelectPage(
-                                  // stateAbbr: 'AL',
-                                  // stateValue: 'Alabama',
-                                  // stateSlug: 'alabama'
-                                  );
+                                  stateIndex: stateIndex,
+                                  stateAbbr: stateAbbr,
+                                  stateValue: stateValue,
+                                  stateSlug: stateSlug);
                             }));
                           }
                         },
@@ -173,8 +174,13 @@ class _StateDataListState extends State<StateDataList> {
   Widget _getStateList(context, index) {
     return InkWell(
         onTap: () {
-          SELECT_STATE = STATE_LIST[index]["value"];
-          // print(SELECT_STATE);
+          // stateAbbr = STATE_LIST[index]["abbr"];
+          // stateValue = STATE_LIST[index]["value"];
+          // stateSlug = STATE_LIST[index]["slug"];
+          stateIndex = index;
+          stateAbbr = 'AL';
+          stateValue = 'Alabama';
+          stateSlug = 'alabama';
           setState(() {
             if (_selectIndex == index) {
               return;
@@ -196,7 +202,7 @@ class _StateDataListState extends State<StateDataList> {
                             BorderSide(width: 1, color: Color(0xffcccccc)))),
                 alignment: Alignment.centerLeft,
                 // margin: EdgeInsets.only(left: 32, right: 32),
-                padding: EdgeInsets.only(left: 32, right: 32),
+                padding: EdgeInsets.only(left: 16, right: 16),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
