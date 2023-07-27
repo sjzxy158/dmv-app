@@ -1,7 +1,11 @@
 import 'dart:io';
+import 'dart:convert';
+import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:http/http.dart' as http;
+import 'package:flutter_webview_plugin/flutter_webview_plugin.dart';
 
 class testListPage extends StatefulWidget {
   final int stateIndex;
@@ -27,35 +31,15 @@ class testListPage extends StatefulWidget {
   _testListPageState createState() => _testListPageState();
 }
 
-List STATE_LIST = [
-  {"id": '1', "slug": 'alabama0', "value": 'Alabama0'},
-  {"id": '2', "slug": 'alabama1', "value": 'Alabama1'},
-  {"id": '3', "slug": 'alabama2', "value": 'Alabama2'},
-  {"id": '4', "slug": 'alabama3', "value": 'Alabama3'},
-  {"id": '5', "slug": 'alabama', "value": 'Alabama'},
-  {"id": '6', "slug": 'alabama4', "value": 'Alabama4'},
-  {"id": '7', "slug": 'alabama4', "value": 'Alabama4'},
-  {"id": '8', "slug": 'alabama4', "value": 'Alabama4'},
-  {"id": '9', "slug": 'alabama4', "value": 'Alabama4'},
-  {"id": '10', "slug": 'alabama4', "value": 'Alabama4'},
-  {"id": '11', "slug": 'alabama4', "value": 'Alabama4'},
-  {"id": '12', "slug": 'alabama4', "value": 'Alabama4'},
-  {"id": '13', "slug": 'alabama8', "value": 'Alabama8'},
-  {"id": '14', "slug": 'alabama8', "value": 'Alabama8'},
-  {"id": '15', "slug": 'alabama8', "value": 'Alabama8'},
-  {"id": '16', "slug": 'alabama6', "value": 'Alabama6'},
-  {"id": '17', "slug": 'alabama6', "value": 'Alabama6'},
-  {"id": '18', "slug": 'alabama6', "value": 'Alabama6'},
-  {"id": '19', "slug": 'alabama6', "value": 'Alabama6'},
-];
+List STATE_LIST = [];
 List TYPE_LIST = [
   {
     "slug": 'car',
     "value": 'Car',
   },
   {
-    "slug": 'motocycle',
-    "value": 'Motocycle',
+    "slug": 'motorcycle',
+    "value": 'Motorcycle',
   },
   {
     "slug": 'cdl',
@@ -63,26 +47,34 @@ List TYPE_LIST = [
   }
 ];
 List TEST_LIST = [
-  {"abbr": 'DMV Test 1', "value": 'DMV Practice Test 1'},
-  {"abbr": 'DMV Test 2', "value": 'DMV Practice Test 2'},
-  {"abbr": 'DMV Test 3', "value": 'DMV Practice Test 3'},
-  {"abbr": 'DMV Test 4', "value": 'DMV Practice Test 4'},
-  {"abbr": 'DMV Test 5', "value": 'DMV Practice Test 5'},
-  {"abbr": 'DMV Test 6', "value": 'DMV Practice Test 6'},
-  {"abbr": 'DMV Test 7', "value": 'DMV Practice Test 7'},
-  {"abbr": 'DMV Test 8', "value": 'DMV Practice Test 8'},
-  {"abbr": 'DMV Test 9', "value": 'DMV Practice Test 9'},
+  {"id": 'DMV Test 1', "name": 'DMV Practice Test 1'},
+  {"id": 'DMV Test 2', "name": 'DMV Practice Test 2'},
+  {"id": 'DMV Test 3', "name": 'DMV Practice Test 3'},
+  {"id": 'DMV Test 4', "name": 'DMV Practice Test 4'},
+  {"id": 'DMV Test 5', "name": 'DMV Practice Test 5'},
+  {"id": 'DMV Test 6', "name": 'DMV Practice Test 6'},
+  {"id": 'DMV Test 7', "name": 'DMV Practice Test 7'},
+  {"id": 'DMV Test 8', "name": 'DMV Practice Test 8'},
+  {"id": 'DMV Test 9', "name": 'DMV Practice Test 9'},
 ];
+
 int cur_state_index = -1;
 int select_state_index = -1;
+String select_state_abbr = '';
 String select_state = '';
+String select_state_slug = '';
+
 int cur_type_index = -1;
 int select_type_index = -1;
 String select_type = '';
+
 int cur_test_index = -1;
 int select_test_index = -1;
 String select_test_abbr = '';
 String select_test_value = '';
+int select_test_ques = 0;
+int select_test_pass = 0;
+String select_test_url = '';
 
 class _testListPageState extends State<testListPage> {
   int stateIndex = -1;
@@ -93,10 +85,72 @@ class _testListPageState extends State<testListPage> {
   String licence = '';
   String licenceLower = '';
   int testIndex = 0;
-  String testAbbr = TEST_LIST[0]['abbr'];
-  String testValue = TEST_LIST[0]['value'];
+  String testAbbr = '';
+  String testValue = '';
+
+  int TestSumNum = 0;
+  int TestQueNum = 0;
+  int TestPassNum = 0;
+
+  String TestUrl = '';
+
+  int _getTestListStatus = -1;
+
+  Future getStateList() async {
+    String url = 'https://api-dmv.silversiri.com/getStateList';
+    var res = await http.post(Uri.parse(url));
+    if (res.statusCode == 200) {
+      var body = json.decode(res.body);
+      setState(() {
+        STATE_LIST = body['data'];
+      });
+      return body;
+    } else {
+      return null;
+    }
+  }
+
+  Future getTestList() async {
+    String url = 'https://api-dmv.silversiri.com/getTestsList';
+    var res = await http.post(
+      Uri.parse(url),
+      body: {'type': licenceLower, 'state': stateSlug},
+    );
+    if (res.statusCode == 200) {
+      var body = json.decode(res.body);
+      // print(body['data']);
+      setState(() {
+        TEST_LIST = body['data'];
+        TestSumNum = body['data'].length;
+        _getTestListStatus = res.statusCode;
+        cur_test_index = testIndex;
+        if (licenceLower != 'cdl') {
+          testAbbr = 'DMV Test ' + TEST_LIST[0]['orders'].toString();
+          testValue = TEST_LIST[0]['name'].split(stateAbbr)[1].trimLeft() +
+              ' ' +
+              TEST_LIST[0]['orders'].toString();
+          TestUrl = 'https://www.dmv-test-pro.com/' +
+              stateSlug +
+              '/' +
+              TEST_LIST[0]['slug'] +
+              '/';
+        } else {
+          testAbbr = TEST_LIST[0]['name'].split(' - ')[0];
+          testValue =
+              TEST_LIST[0]["name"] + ' ' + TEST_LIST[0]['orders'].toString();
+        }
+        TestQueNum = TEST_LIST[0]['question_num'];
+        TestPassNum = TEST_LIST[0]['qualifying_num'];
+      });
+      return body;
+    } else {
+      return null;
+    }
+  }
+
   @override
   void initState() {
+    getStateList();
     stateIndex = widget.stateIndex;
     stateAbbr = widget.stateAbbr;
     stateValue = widget.stateValue;
@@ -104,16 +158,17 @@ class _testListPageState extends State<testListPage> {
     licenceIndex = widget.licenceIndex;
     licence = widget.licence;
     licenceLower = widget.licenceLower;
+    getTestList();
 
     cur_state_index = stateIndex;
     cur_type_index = licenceIndex;
     cur_test_index = testIndex;
-    print(stateIndex);
-    print(stateAbbr);
-    print(stateValue);
-    print(stateSlug);
-    print(licence);
-    print(licenceLower);
+    // print(stateIndex);
+    // print(stateAbbr);
+    // print(stateValue);
+    // print(stateSlug);
+    // print(licence);
+    // print(licenceLower);
   }
 
   @override
@@ -128,140 +183,180 @@ class _testListPageState extends State<testListPage> {
         decoration: BoxDecoration(color: Color(0xffdddddd)),
         child: Stack(
           children: [
-            Container(
-                margin: EdgeInsets.only(top: statusBar + 88),
-                child: Column(
-                  children: [
-                    Container(
-                        width: double.infinity,
-                        height: 280,
-                        margin: EdgeInsets.only(left: 16, right: 16),
-                        padding: EdgeInsets.fromLTRB(16, 20, 16, 16),
-                        decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(4),
-                            color: Colors.white),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              "$stateValue Driver's Examination",
-                              style: TextStyle(
-                                fontFamily: 'GoogleSans-Medium',
-                                fontSize: 14,
-                              ),
-                            ),
-                            Text(
-                              "(From the 2021 $stateValue driver handbook)",
-                              style: TextStyle(
-                                fontFamily: 'GoogleSans-Regular',
-                                fontSize: 12,
-                                color: Colors.grey,
-                              ),
-                            ),
-                            Padding(
-                              padding: EdgeInsets.only(top: 16, bottom: 16),
-                              child: Text(
-                                "24 tests",
-                                style: TextStyle(
-                                  fontFamily: 'GoofleSans-Regular',
-                                  fontSize: 16,
-                                ),
-                              ),
-                            ),
-                            Divider(
-                              height: 2,
-                              color: Colors.grey,
-                            ),
-                            Padding(
-                              padding: EdgeInsets.only(top: 20, bottom: 20),
-                              child: Text(
-                                testValue,
-                                style: TextStyle(
-                                  fontFamily: 'GoogleSans-Bold',
-                                  fontSize: 22,
-                                ),
-                              ),
-                            ),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            _getTestListStatus == 200
+                ? Container(
+                    margin: EdgeInsets.only(top: statusBar + 88),
+                    child: Column(
+                      children: [
+                        Container(
+                            width: double.infinity,
+                            height: 280,
+                            margin: EdgeInsets.only(left: 16, right: 16),
+                            padding: EdgeInsets.fromLTRB(16, 20, 16, 16),
+                            decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(4),
+                                color: Colors.white),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Container(
-                                  width: 152,
-                                  // constraints:BoxConstraints(
-                                  //   minWidth:
-                                  // ),
-                                  padding: EdgeInsets.fromLTRB(24, 12, 24, 8),
-                                  decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(4),
-                                      color: Color(0xffe8f0fe)),
-                                  child: Column(children: [
-                                    Text('Numbers of questions',
-                                        style: TextStyle(
-                                          fontFamily: 'GoogleSans-Medium',
-                                          fontSize: 12,
-                                        ),
-                                        textAlign: TextAlign.center),
-                                    Padding(
-                                      padding: const EdgeInsets.only(top: 8),
-                                      child: Text(
-                                        '30',
-                                        style: TextStyle(
-                                          fontFamily: 'GoogleSans-Bold',
-                                          fontSize: 22,
-                                          color: Color(0xff255dd9),
-                                        ),
-                                      ),
-                                    ),
-                                  ]),
+                                Text(
+                                  "$stateValue Driver's Examination",
+                                  style: TextStyle(
+                                    fontFamily: 'GoogleSans-Medium',
+                                    fontSize: 14,
+                                  ),
                                 ),
-                                Container(
-                                  width: 152,
-                                  padding: EdgeInsets.fromLTRB(48, 12, 48, 8),
-                                  decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(4),
-                                      color: Color(0xffe8f0fe)),
-                                  child: Column(children: [
-                                    Text('Passing score',
-                                        style: TextStyle(
-                                          fontFamily: 'GoogleSans-Medium',
-                                          fontSize: 12,
-                                        ),
-                                        textAlign: TextAlign.center),
-                                    Padding(
-                                      padding: const EdgeInsets.only(top: 8),
-                                      child: Text(
-                                        '24',
-                                        style: TextStyle(
-                                          fontFamily: 'GoogleSans-Bold',
-                                          fontSize: 22,
-                                          color: Color(0xff255dd9),
-                                        ),
-                                      ),
-                                    ),
-                                  ]),
+                                Text(
+                                  "(From the 2021 $stateValue driver handbook)",
+                                  style: TextStyle(
+                                    fontFamily: 'GoogleSans-Regular',
+                                    fontSize: 12,
+                                    color: Colors.grey,
+                                  ),
                                 ),
+                                Padding(
+                                  padding: EdgeInsets.only(top: 16, bottom: 16),
+                                  child: Text(
+                                    "$TestSumNum tests",
+                                    style: TextStyle(
+                                      fontFamily: 'GoofleSans-Regular',
+                                      fontSize: 16,
+                                    ),
+                                  ),
+                                ),
+                                Divider(
+                                  height: 2,
+                                  color: Colors.grey,
+                                ),
+                                Padding(
+                                  padding: EdgeInsets.only(top: 20, bottom: 20),
+                                  child: Text(
+                                    testValue,
+                                    style: TextStyle(
+                                      fontFamily: 'GoogleSans-Bold',
+                                      fontSize: 22,
+                                    ),
+                                  ),
+                                ),
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Container(
+                                      width: 152,
+                                      // constraints:BoxConstraints(
+                                      //   minWidth:
+                                      // ),
+                                      padding:
+                                          EdgeInsets.fromLTRB(24, 12, 24, 8),
+                                      decoration: BoxDecoration(
+                                          borderRadius:
+                                              BorderRadius.circular(4),
+                                          color: Color(0xffe8f0fe)),
+                                      child: Column(children: [
+                                        Text('Numbers of questions',
+                                            style: TextStyle(
+                                              fontFamily: 'GoogleSans-Medium',
+                                              fontSize: 12,
+                                            ),
+                                            textAlign: TextAlign.center),
+                                        Padding(
+                                          padding:
+                                              const EdgeInsets.only(top: 8),
+                                          child: Text(
+                                            '$TestQueNum',
+                                            style: TextStyle(
+                                              fontFamily: 'GoogleSans-Bold',
+                                              fontSize: 22,
+                                              color: Color(0xff255dd9),
+                                            ),
+                                          ),
+                                        ),
+                                      ]),
+                                    ),
+                                    Container(
+                                      width: 152,
+                                      padding:
+                                          EdgeInsets.fromLTRB(48, 12, 48, 8),
+                                      decoration: BoxDecoration(
+                                          borderRadius:
+                                              BorderRadius.circular(4),
+                                          color: Color(0xffe8f0fe)),
+                                      child: Column(children: [
+                                        Text('Passing score',
+                                            style: TextStyle(
+                                              fontFamily: 'GoogleSans-Medium',
+                                              fontSize: 12,
+                                            ),
+                                            textAlign: TextAlign.center),
+                                        Padding(
+                                          padding:
+                                              const EdgeInsets.only(top: 8),
+                                          child: Text(
+                                            '$TestPassNum',
+                                            style: TextStyle(
+                                              fontFamily: 'GoogleSans-Bold',
+                                              fontSize: 22,
+                                              color: Color(0xff255dd9),
+                                            ),
+                                          ),
+                                        ),
+                                      ]),
+                                    ),
+                                  ],
+                                )
                               ],
-                            )
-                          ],
-                        )),
-                    Container(
-                        height: 48,
-                        width: 200,
-                        margin: EdgeInsets.only(top: 48),
-                        decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(4),
-                            color: Color(0xff255dd9)),
-                        child: Center(
-                          child: Text(
-                            'Start',
-                            style: TextStyle(
-                                color: Colors.white,
-                                fontFamily: 'GoogleSans-Bold',
-                                fontSize: 18),
-                          ),
-                        )),
-                  ],
-                )),
+                            )),
+                        InkWell(
+                          onTap: () {
+                            print(TestUrl);
+                            Navigator.pushReplacement(context,
+                                MaterialPageRoute(builder: (context) {
+                              // return WebView(
+                              //   initialUrl: 'https://www.dmv-test-pro.com',
+                              // );
+                              return MaterialApp(
+                                title: 'Welcome to DMV',
+                                theme: ThemeData(
+                                    primarySwatch: Colors.green,
+                                    primaryColor: Colors.white),
+                                routes: {
+                                  "/": (_) => WebviewScaffold(
+                                      // url: "https://www.menuwithnutrition.com/",
+                                      // url: "https://dmv.silversiri.com",
+                                      // url: "https://www.dmv-test-pro.com",
+                                      url: TestUrl,
+                                      appBar: PreferredSize(
+                                          // child: AppBar(), preferredSize: const Size.fromHeight(0.0))),
+                                          child: AppBar(
+                                            backgroundColor: Colors.white,
+                                          ),
+                                          preferredSize: Size.fromHeight(0.0))),
+                                },
+                                debugShowCheckedModeBanner: false,
+                              );
+                            }));
+                          },
+                          child: Container(
+                              height: 48,
+                              width: 200,
+                              margin: EdgeInsets.only(top: 48),
+                              decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(4),
+                                  color: Color(0xff255dd9)),
+                              child: Center(
+                                child: Text(
+                                  'Start',
+                                  style: TextStyle(
+                                      color: Colors.white,
+                                      fontFamily: 'GoogleSans-Bold',
+                                      fontSize: 18),
+                                ),
+                              )),
+                        )
+                      ],
+                    ))
+                : _loadDownloadWidget(),
             Container(
                 height: 56,
                 margin: EdgeInsets.only(top: statusBar),
@@ -280,7 +375,6 @@ class _testListPageState extends State<testListPage> {
                           // 开启州列表弹框
                           InkWell(
                             onTap: () {
-                              print('开启州列表弹框');
                               showModalBottomSheet(
                                   isDismissible: true, //点击空白处返回功能，默认是true
                                   enableDrag: true, //是否允许拖动
@@ -363,7 +457,13 @@ class _testListPageState extends State<testListPage> {
                                                       cur_state_index =
                                                           select_state_index;
                                                       stateValue = select_state;
+                                                      stateAbbr =
+                                                          select_state_abbr;
+                                                      stateSlug =
+                                                          select_state_slug;
+                                                      _getTestListStatus = -1;
                                                     });
+                                                    getTestList();
                                                     Navigator.pop(context);
                                                   },
                                                   child: Text(
@@ -493,6 +593,11 @@ class _testListPageState extends State<testListPage> {
                                                           select_test_abbr;
                                                       testValue =
                                                           select_test_value;
+                                                      TestQueNum =
+                                                          select_test_ques;
+                                                      TestPassNum =
+                                                          select_test_pass;
+                                                      TestUrl = select_test_url;
                                                     });
                                                     Navigator.pop(context);
                                                   },
@@ -513,7 +618,10 @@ class _testListPageState extends State<testListPage> {
                                           margin: EdgeInsets.only(top: 59),
                                           child: ScrollConfiguration(
                                             behavior: MyBehavior(),
-                                            child: TestDataList(),
+                                            child: TestDataList(
+                                              splitStateAbbr: stateAbbr,
+                                              urlStateSlug: stateSlug,
+                                            ),
                                           ),
                                         )
                                       ],
@@ -523,12 +631,16 @@ class _testListPageState extends State<testListPage> {
                             child: Row(
                               children: [
                                 Container(
-                                  margin: EdgeInsets.only(right: 8),
-                                  child: Text(
-                                    testAbbr,
-                                    style: barTextStyle,
-                                  ),
-                                ),
+                                    margin: EdgeInsets.only(right: 8),
+                                    child: Container(
+                                      width: 100,
+                                      alignment: Alignment.centerRight,
+                                      child: Text(
+                                        testAbbr,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: barTextStyle,
+                                      ),
+                                    )),
                                 SvgPicture.asset(
                                     'images/arrow-down-filling.svg',
                                     width: 12)
@@ -556,18 +668,22 @@ class _testListPageState extends State<testListPage> {
                                         setState(() {
                                           licenceLower = 'cdl';
                                           cur_type_index = 2;
+                                          _getTestListStatus = -1;
                                         });
-                                      } else if (licenceLower == 'motocycle') {
+                                      } else if (licenceLower == 'motorcycle') {
                                         setState(() {
                                           licenceLower = 'car';
                                           cur_type_index = 0;
+                                          _getTestListStatus = -1;
                                         });
                                       } else if (licenceLower == 'cdl') {
                                         setState(() {
-                                          licenceLower = 'motocycle';
+                                          licenceLower = 'motorcycle';
                                           cur_type_index = 1;
+                                          _getTestListStatus = -1;
                                         });
                                       }
+                                      getTestList();
                                     },
                                     child: SvgPicture.asset(
                                         'images/arrow-left-filling.svg',
@@ -668,7 +784,10 @@ class _testListPageState extends State<testListPage> {
                                                                   select_type_index;
                                                               licenceLower =
                                                                   select_type;
+                                                              _getTestListStatus =
+                                                                  -1;
                                                             });
+                                                            getTestList();
                                                             Navigator.pop(
                                                                 context);
                                                           },
@@ -708,20 +827,24 @@ class _testListPageState extends State<testListPage> {
                                     onTap: () {
                                       if (licenceLower == 'car') {
                                         setState(() {
-                                          licenceLower = 'motocycle';
+                                          licenceLower = 'motorcycle';
                                           cur_type_index = 1;
+                                          _getTestListStatus = -1;
                                         });
-                                      } else if (licenceLower == 'motocycle') {
+                                      } else if (licenceLower == 'motorcycle') {
                                         setState(() {
                                           licenceLower = 'cdl';
                                           cur_type_index = 2;
+                                          _getTestListStatus = -1;
                                         });
                                       } else if (licenceLower == 'cdl') {
                                         setState(() {
                                           licenceLower = 'car';
                                           cur_type_index = 0;
+                                          _getTestListStatus = -1;
                                         });
                                       }
+                                      getTestList();
                                     },
                                     child: SvgPicture.asset(
                                         'images/arrow-right-filling.svg',
@@ -736,6 +859,14 @@ class _testListPageState extends State<testListPage> {
         ),
       ),
     );
+  }
+
+  Widget _loadDownloadWidget() {
+    return const Center(
+        child: CircularProgressIndicator(
+            backgroundColor: Color.fromARGB(255, 37, 93, 217),
+            valueColor:
+                AlwaysStoppedAnimation(Color.fromARGB(255, 225, 225, 225))));
   }
 }
 
@@ -768,7 +899,9 @@ class _StateDataListState extends State<StateDataList> {
             } else {
               _selectIndex = index;
               select_state_index = index;
-              select_state = STATE_LIST[index]["value"];
+              select_state_abbr = STATE_LIST[index]["sub_name"];
+              select_state = STATE_LIST[index]["name"];
+              select_state_slug = STATE_LIST[index]["slug"];
             }
           });
         },
@@ -790,7 +923,7 @@ class _StateDataListState extends State<StateDataList> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      STATE_LIST[index]["value"],
+                      STATE_LIST[index]["name"],
                       style: TextStyle(
                         fontSize: 14,
                         fontFamily: 'GoogleSans-Regular',
@@ -876,12 +1009,27 @@ class _TypeDataListState extends State<TypeDataList> {
 }
 
 class TestDataList extends StatefulWidget {
+  final String splitStateAbbr;
+  final String urlStateSlug;
+
+  const TestDataList(
+      {Key? key, required this.splitStateAbbr, required this.urlStateSlug})
+      : super(key: key);
   @override
   _TestDataListState createState() => _TestDataListState();
 }
 
 class _TestDataListState extends State<TestDataList> {
   int _selectIndex = cur_test_index;
+  String splitStateAbbr = '';
+  String urlStateSlug = '';
+
+  @override
+  void initState() {
+    splitStateAbbr = widget.splitStateAbbr;
+    urlStateSlug = widget.urlStateSlug;
+    print(splitStateAbbr);
+  }
 
   Widget _getTestList(context, index) {
     return InkWell(
@@ -892,8 +1040,37 @@ class _TestDataListState extends State<TestDataList> {
             } else {
               _selectIndex = index;
               select_test_index = index;
-              select_test_abbr = TEST_LIST[index]["abbr"];
-              select_test_value = TEST_LIST[index]["value"];
+              if (cur_type_index != 2) {
+                select_test_abbr =
+                    'DMV Test ' + TEST_LIST[index]['orders'].toString();
+                if (index == 0) {
+                  select_test_value = TEST_LIST[index]['name']
+                          .split(splitStateAbbr)[1]
+                          .trimLeft() +
+                      ' ' +
+                      TEST_LIST[index]['orders'].toString();
+                } else {
+                  select_test_value = TEST_LIST[index]['name']
+                      .split(splitStateAbbr)[1]
+                      .trimLeft();
+                }
+                select_test_url = 'https://www.dmv-test-pro.com/' +
+                    urlStateSlug +
+                    '/' +
+                    TEST_LIST[index]['slug'] +
+                    '/';
+              } else {
+                select_test_abbr = TEST_LIST[index]['name'].split(' - ')[0];
+                if (index == 0) {
+                  select_test_value = TEST_LIST[0]["name"] +
+                      ' ' +
+                      TEST_LIST[0]['orders'].toString();
+                } else {
+                  select_test_value = TEST_LIST[index]["name"];
+                }
+              }
+              select_test_ques = TEST_LIST[index]['question_num'];
+              select_test_pass = TEST_LIST[index]['qualifying_num'];
             }
           });
         },
@@ -915,7 +1092,7 @@ class _TestDataListState extends State<TestDataList> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      TEST_LIST[index]["value"],
+                      TEST_LIST[index]["name"],
                       style: TextStyle(
                         fontSize: 14,
                         fontFamily: 'GoogleSans-Regular',

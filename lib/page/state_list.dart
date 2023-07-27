@@ -1,10 +1,12 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:app/page/type.dart';
 
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_webview_plugin/flutter_webview_plugin.dart';
+import 'package:http/http.dart' as http;
 
 class StateListPage extends StatefulWidget {
   const StateListPage({Key? key}) : super(key: key);
@@ -13,27 +15,7 @@ class StateListPage extends StatefulWidget {
   _StateListPageState createState() => _StateListPageState();
 }
 
-List STATE_LIST = [
-  {"id": '1', "slug": 'alabama0', "value": 'Alabama0'},
-  {"id": '2', "slug": 'alabama1', "value": 'Alabama1'},
-  {"id": '3', "slug": 'alabama2', "value": 'Alabama2'},
-  {"id": '4', "slug": 'alabama3', "value": 'Alabama3'},
-  {"id": '5', "slug": 'alabama', "value": 'Alabama'},
-  {"id": '6', "slug": 'alabama4', "value": 'Alabama4'},
-  {"id": '7', "slug": 'alabama4', "value": 'Alabama4'},
-  {"id": '8', "slug": 'alabama4', "value": 'Alabama4'},
-  {"id": '9', "slug": 'alabama4', "value": 'Alabama4'},
-  {"id": '10', "slug": 'alabama4', "value": 'Alabama4'},
-  {"id": '11', "slug": 'alabama4', "value": 'Alabama4'},
-  {"id": '12', "slug": 'alabama4', "value": 'Alabama4'},
-  {"id": '13', "slug": 'alabama8', "value": 'Alabama8'},
-  {"id": '14', "slug": 'alabama8', "value": 'Alabama8'},
-  {"id": '15', "slug": 'alabama8', "value": 'Alabama8'},
-  {"id": '16', "slug": 'alabama6', "value": 'Alabama6'},
-  {"id": '17', "slug": 'alabama6', "value": 'Alabama6'},
-  {"id": '18', "slug": 'alabama6', "value": 'Alabama6'},
-  {"id": '19', "slug": 'alabama6', "value": 'Alabama6'},
-];
+List STATE_LIST = [];
 int stateIndex = -1;
 String stateAbbr = '';
 String stateValue = '';
@@ -41,6 +23,29 @@ String stateSlug = '';
 
 class _StateListPageState extends State<StateListPage> {
   bool _tipVisible = false;
+  int _getStateListStatus = -1;
+
+  Future getStateList() async {
+    String url = 'https://api-dmv.silversiri.com/getStateList';
+    var res = await http.post(Uri.parse(url));
+    if (res.statusCode == 200) {
+      var body = json.decode(res.body);
+      // print(body['data']);
+      setState(() {
+        STATE_LIST = body['data'];
+        _getStateListStatus = res.statusCode;
+      });
+      return body;
+    } else {
+      return null;
+    }
+  }
+
+  @override
+  void initState() {
+    getStateList();
+  }
+
   @override
   Widget build(BuildContext context) {
     double statusBar = MediaQuery.of(context).padding.top;
@@ -59,9 +64,10 @@ class _StateListPageState extends State<StateListPage> {
               Container(
                 padding: EdgeInsets.only(bottom: 80),
                 child: ScrollConfiguration(
-                  behavior: MyBehavior(),
-                  child: StateDataList(),
-                ),
+                    behavior: MyBehavior(),
+                    child: _getStateListStatus == 200
+                        ? StateDataList()
+                        : _loadDownloadWidget()),
               ),
               Positioned(
                   bottom: 0.0,
@@ -149,6 +155,14 @@ class _StateListPageState extends State<StateListPage> {
       // },
     );
   }
+
+  Widget _loadDownloadWidget() {
+    return const Center(
+        child: CircularProgressIndicator(
+            backgroundColor: Color.fromARGB(255, 37, 93, 217),
+            valueColor:
+                AlwaysStoppedAnimation(Color.fromARGB(255, 225, 225, 225))));
+  }
 }
 
 class MyBehavior extends ScrollBehavior {
@@ -174,13 +188,14 @@ class _StateDataListState extends State<StateDataList> {
   Widget _getStateList(context, index) {
     return InkWell(
         onTap: () {
-          // stateAbbr = STATE_LIST[index]["abbr"];
-          // stateValue = STATE_LIST[index]["value"];
-          // stateSlug = STATE_LIST[index]["slug"];
           stateIndex = index;
-          stateAbbr = 'AL';
-          stateValue = 'Alabama';
-          stateSlug = 'alabama';
+          // stateAbbr = 'AL';
+          // stateValue = 'Alabama';
+          // stateSlug = 'alabama';
+          stateAbbr = STATE_LIST[index]["sub_name"];
+          stateValue = STATE_LIST[index]["name"];
+          stateSlug = STATE_LIST[index]["slug"];
+
           setState(() {
             if (_selectIndex == index) {
               return;
@@ -207,7 +222,7 @@ class _StateDataListState extends State<StateDataList> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      STATE_LIST[index]["value"],
+                      STATE_LIST[index]["name"],
                       style: TextStyle(
                         fontSize: 18,
                         fontFamily: 'GoogleSans-Regular',
@@ -245,3 +260,14 @@ class _StateDataListState extends State<StateDataList> {
         itemCount: STATE_LIST.length, itemBuilder: this._getStateList);
   }
 }
+
+// class CommonModel {
+//   final int StatusCode;
+//   final List dataList;
+
+//   CommonModel({required this.StatusCode, required this.dataList});
+
+//   factory CommonModel.fromJson(Map<String, dynamic> json) {
+//     return CommonModel(StatusCode: json['code'], dataList: json['data']);
+//   }
+// }

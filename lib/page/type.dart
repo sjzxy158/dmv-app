@@ -56,7 +56,7 @@ class _TypeSelectPageState extends State<TypeSelectPage> {
               decoration: BoxDecoration(color: Color(0xffdddddd)),
               child: Column(children: <Widget>[
                 _typeItem('Car', 0),
-                _typeItem('Motocycle', 1),
+                _typeItem('Motorcycle', 1),
                 _typeItem('CDL', 2),
               ]),
             )));
