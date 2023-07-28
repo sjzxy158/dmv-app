@@ -2,12 +2,15 @@ import 'dart:io';
 
 import 'package:app/page/state_list.dart';
 import 'package:app/page/type.dart';
+import 'package:app/page/test_list.dart';
+
 import 'package:flutter/material.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import '../ad_helper.dart';
 import 'package:flutter_webview_plugin/flutter_webview_plugin.dart';
 import 'package:webview_flutter/webview_flutter.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class StartPage extends StatefulWidget {
   // final String? lang;
@@ -24,6 +27,17 @@ class _StartPage extends State<StartPage> {
   NativeAd? _ad;
   int show = 0;
   int _adError = 0;
+
+  int StateSelectStatus = -1;
+  int TypeSelectStatus = -1;
+
+  int stateIndex = -1;
+  String stateAbbr = '';
+  String stateValue = '';
+  String stateSlug = '';
+  int licenceIndex = -1;
+  String licence = '';
+  String licenceLower = '';
 
   @override
   void dispose() {
@@ -57,6 +71,7 @@ class _StartPage extends State<StartPage> {
         },
       ),
     ).load();
+    _getStateAndTypeSelectStatus();
   }
 
   @override
@@ -85,7 +100,19 @@ class _StartPage extends State<StartPage> {
                             // return WebView(
                             //   initialUrl: 'https://www.dmv-test-pro.com',
                             // );
-                            return StateListPage();
+                            return StateSelectStatus == 1 &&
+                                    TypeSelectStatus == 1
+                                ? testListPage(
+                                    stateIndex: stateIndex,
+                                    stateAbbr: stateAbbr,
+                                    stateValue: stateValue,
+                                    stateSlug: stateSlug,
+                                    licenceIndex: licenceIndex,
+                                    licence: licence,
+                                    licenceLower: licenceLower,
+                                  )
+                                : StateListPage();
+                            // ;
                             // return TypeSelectPage();
                             // return MaterialApp(
                             //   title: 'Welcome to DMV',
@@ -154,7 +181,18 @@ class _StartPage extends State<StartPage> {
                                   // return WebView(
                                   //   initialUrl: 'https://www.dmv-test-pro.com',
                                   // );
-                                  return StateListPage();
+                                  return StateSelectStatus == 1 &&
+                                          TypeSelectStatus == 1
+                                      ? testListPage(
+                                          stateIndex: stateIndex,
+                                          stateAbbr: stateAbbr,
+                                          stateValue: stateValue,
+                                          stateSlug: stateSlug,
+                                          licenceIndex: licenceIndex,
+                                          licence: licence,
+                                          licenceLower: licenceLower,
+                                        )
+                                      : StateListPage();
                                   // return TypeSelectPage();
                                   // return MaterialApp(
                                   //   title: 'Welcome to DMV',
@@ -212,5 +250,32 @@ class _StartPage extends State<StartPage> {
             backgroundColor: Color.fromARGB(255, 37, 93, 217),
             valueColor:
                 AlwaysStoppedAnimation(Color.fromARGB(255, 225, 225, 225))));
+  }
+
+  _getStateAndTypeSelectStatus() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    print('------------------------------');
+    print(prefs.getInt('stateSelectStatus'));
+    print(prefs.getInt('typeSelectStatus'));
+
+    print(prefs.getInt('stateSelectIndex'));
+    print(prefs.getString('stateSelectAbbr'));
+    print(prefs.getString('stateSelectValue'));
+    print(prefs.getString('stateSelectSlug'));
+    print(prefs.getInt('typeSelectLicenceIndex'));
+    print(prefs.getString('typeSelectLicence'));
+    print(prefs.getString('typeSelectLicenceLowerr'));
+    setState(() {
+      StateSelectStatus = prefs.getInt('stateSelectStatus');
+      TypeSelectStatus = prefs.getInt('typeSelectStatus');
+
+      stateIndex = prefs.getInt('stateSelectIndex');
+      stateAbbr = prefs.getString('stateSelectAbbr');
+      stateValue = prefs.getString('stateSelectValue');
+      stateSlug = prefs.getString('stateSelectSlug');
+      licenceIndex = prefs.getInt('typeSelectLicenceIndex');
+      licence = prefs.getString('typeSelectLicence');
+      licenceLower = prefs.getString('typeSelectLicenceLowerr');
+    });
   }
 }

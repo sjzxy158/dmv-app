@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_webview_plugin/flutter_webview_plugin.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class testListPage extends StatefulWidget {
   final int stateIndex;
@@ -66,6 +67,7 @@ String select_state_slug = '';
 
 int cur_type_index = -1;
 int select_type_index = -1;
+String select_type_value = '';
 String select_type = '';
 
 int cur_test_index = -1;
@@ -138,6 +140,13 @@ class _testListPageState extends State<testListPage> {
           testAbbr = TEST_LIST[0]['name'].split(' - ')[0];
           testValue =
               TEST_LIST[0]["name"] + ' ' + TEST_LIST[0]['orders'].toString();
+          TestUrl = 'https://www.dmv-test-pro.com/' +
+              stateSlug +
+              '/' +
+              stateAbbr.toLowerCase() +
+              '-' +
+              TEST_LIST[0]['slug'] +
+              '/';
         }
         TestQueNum = TEST_LIST[0]['question_num'];
         TestPassNum = TEST_LIST[0]['qualifying_num'];
@@ -322,9 +331,6 @@ class _testListPageState extends State<testListPage> {
                                     primaryColor: Colors.white),
                                 routes: {
                                   "/": (_) => WebviewScaffold(
-                                      // url: "https://www.menuwithnutrition.com/",
-                                      // url: "https://dmv.silversiri.com",
-                                      // url: "https://www.dmv-test-pro.com",
                                       url: TestUrl,
                                       appBar: PreferredSize(
                                           // child: AppBar(), preferredSize: const Size.fromHeight(0.0))),
@@ -464,6 +470,11 @@ class _testListPageState extends State<testListPage> {
                                                       _getTestListStatus = -1;
                                                     });
                                                     getTestList();
+                                                    _setStateSelectStatus(
+                                                        cur_state_index,
+                                                        stateAbbr,
+                                                        stateValue,
+                                                        stateSlug);
                                                     Navigator.pop(context);
                                                   },
                                                   child: Text(
@@ -669,18 +680,33 @@ class _testListPageState extends State<testListPage> {
                                           licenceLower = 'cdl';
                                           cur_type_index = 2;
                                           _getTestListStatus = -1;
+                                          _setTypeSelectStatus(
+                                            cur_type_index,
+                                            'CDL',
+                                            licenceLower,
+                                          );
                                         });
                                       } else if (licenceLower == 'motorcycle') {
                                         setState(() {
                                           licenceLower = 'car';
                                           cur_type_index = 0;
                                           _getTestListStatus = -1;
+                                          _setTypeSelectStatus(
+                                            cur_type_index,
+                                            'Car',
+                                            licenceLower,
+                                          );
                                         });
                                       } else if (licenceLower == 'cdl') {
                                         setState(() {
                                           licenceLower = 'motorcycle';
                                           cur_type_index = 1;
                                           _getTestListStatus = -1;
+                                          _setTypeSelectStatus(
+                                            cur_type_index,
+                                            'Motorcycle',
+                                            licenceLower,
+                                          );
                                         });
                                       }
                                       getTestList();
@@ -782,11 +808,17 @@ class _testListPageState extends State<testListPage> {
                                                             setState(() {
                                                               cur_type_index =
                                                                   select_type_index;
+                                                              licence =
+                                                                  select_type_value;
                                                               licenceLower =
                                                                   select_type;
                                                               _getTestListStatus =
                                                                   -1;
                                                             });
+                                                            _setTypeSelectStatus(
+                                                                cur_type_index,
+                                                                licence,
+                                                                licenceLower);
                                                             getTestList();
                                                             Navigator.pop(
                                                                 context);
@@ -830,18 +862,33 @@ class _testListPageState extends State<testListPage> {
                                           licenceLower = 'motorcycle';
                                           cur_type_index = 1;
                                           _getTestListStatus = -1;
+                                          _setTypeSelectStatus(
+                                            cur_type_index,
+                                            'Motorcycle',
+                                            licenceLower,
+                                          );
                                         });
                                       } else if (licenceLower == 'motorcycle') {
                                         setState(() {
                                           licenceLower = 'cdl';
                                           cur_type_index = 2;
                                           _getTestListStatus = -1;
+                                          _setTypeSelectStatus(
+                                            cur_type_index,
+                                            'CDL',
+                                            licenceLower,
+                                          );
                                         });
                                       } else if (licenceLower == 'cdl') {
                                         setState(() {
                                           licenceLower = 'car';
                                           cur_type_index = 0;
                                           _getTestListStatus = -1;
+                                          _setTypeSelectStatus(
+                                            cur_type_index,
+                                            'Car',
+                                            licenceLower,
+                                          );
                                         });
                                       }
                                       getTestList();
@@ -859,6 +906,24 @@ class _testListPageState extends State<testListPage> {
         ),
       ),
     );
+  }
+
+  _setStateSelectStatus(stateIndex, stateAbbr, stateValue, stateSlug) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    // 州选择状态
+    await prefs.setInt('stateSelectIndex', stateIndex);
+    await prefs.setString('stateSelectAbbr', stateAbbr);
+    await prefs.setString('stateSelectValue', stateValue);
+    await prefs.setString('stateSelectSlug', stateSlug);
+  }
+
+  _setTypeSelectStatus(licenceIndex, licence, licenceLower) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    // 类型选择状态
+    await prefs.setInt('typeSelectStatus', 1);
+    await prefs.setInt('typeSelectLicenceIndex', licenceIndex);
+    await prefs.setString('typeSelectLicence', licence);
+    await prefs.setString('typeSelectLicenceLowerr', licenceLower);
   }
 
   Widget _loadDownloadWidget() {
@@ -963,6 +1028,7 @@ class _TypeDataListState extends State<TypeDataList> {
             } else {
               _selectIndex = index;
               select_type_index = index;
+              select_type_value = TYPE_LIST[index]["value"];
               select_type = TYPE_LIST[index]["slug"];
             }
           });
@@ -1068,6 +1134,13 @@ class _TestDataListState extends State<TestDataList> {
                 } else {
                   select_test_value = TEST_LIST[index]["name"];
                 }
+                select_test_url = 'https://www.dmv-test-pro.com/' +
+                    urlStateSlug +
+                    '/' +
+                    splitStateAbbr.toLowerCase() +
+                    '-' +
+                    TEST_LIST[index]['slug'] +
+                    '/';
               }
               select_test_ques = TEST_LIST[index]['question_num'];
               select_test_pass = TEST_LIST[index]['qualifying_num'];

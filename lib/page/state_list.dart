@@ -7,6 +7,7 @@ import 'package:app/page/type.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_webview_plugin/flutter_webview_plugin.dart';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 
 class StateListPage extends StatefulWidget {
   const StateListPage({Key? key}) : super(key: key);
@@ -44,6 +45,7 @@ class _StateListPageState extends State<StateListPage> {
   @override
   void initState() {
     getStateList();
+    //
   }
 
   @override
@@ -93,6 +95,8 @@ class _StateListPageState extends State<StateListPage> {
                             });
                           } else {
                             // 本地存储state
+                            _setStateSelectStatus(
+                                stateIndex, stateAbbr, stateValue, stateSlug);
                             // 跳转
                             Navigator.push(context,
                                 MaterialPageRoute(builder: (context) {
@@ -154,6 +158,16 @@ class _StateListPageState extends State<StateListPage> {
       //   'type': (BuildContext context) => TypeSelectPage(),
       // },
     );
+  }
+
+  _setStateSelectStatus(stateIndex, stateAbbr, stateValue, stateSlug) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    // 州选择状态
+    await prefs.setInt('stateSelectStatus', 1);
+    await prefs.setInt('stateSelectIndex', stateIndex);
+    await prefs.setString('stateSelectAbbr', stateAbbr);
+    await prefs.setString('stateSelectValue', stateValue);
+    await prefs.setString('stateSelectSlug', stateSlug);
   }
 
   Widget _loadDownloadWidget() {

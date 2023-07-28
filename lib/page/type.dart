@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_webview_plugin/flutter_webview_plugin.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class TypeSelectPage extends StatefulWidget {
   final int stateIndex;
@@ -62,17 +63,21 @@ class _TypeSelectPageState extends State<TypeSelectPage> {
             )));
   }
 
+  _setTypeSelectStatus(licenceIndex, licence, licenceLower) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    // 类型选择状态
+    await prefs.setInt('typeSelectStatus', 1);
+    await prefs.setInt('typeSelectLicenceIndex', licenceIndex);
+    await prefs.setString('typeSelectLicence', licence);
+    await prefs.setString('typeSelectLicenceLowerr', licenceLower);
+  }
+
   _typeItem(String licence, int index) {
     String licenceLower = licence.toLowerCase();
     return InkWell(
       onTap: () {
         // 本地存储 licence
-        // 跳转
-        // print(stateAbbr);
-        // print(stateValue);
-        // print(stateSlug);
-        // print(licence);
-        // print(licenceLower);
+        _setTypeSelectStatus(index, licence, licenceLower);
         Navigator.push(context, MaterialPageRoute(builder: (context) {
           return testListPage(
             stateIndex: stateIndex,
