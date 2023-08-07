@@ -17,10 +17,11 @@ import 'package:firebase_analytics/firebase_analytics.dart';
 // }
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  MobileAds.instance.initialize();
+
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  MobileAds.instance.initialize();
 
   runApp(const MyApp());
 }

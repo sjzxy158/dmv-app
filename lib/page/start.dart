@@ -254,17 +254,6 @@ class _StartPage extends State<StartPage> {
 
   _getStateAndTypeSelectStatus() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    print('------------------------------');
-    print(prefs.getInt('stateSelectStatus'));
-    print(prefs.getInt('typeSelectStatus'));
-
-    print(prefs.getInt('stateSelectIndex'));
-    print(prefs.getString('stateSelectAbbr'));
-    print(prefs.getString('stateSelectValue'));
-    print(prefs.getString('stateSelectSlug'));
-    print(prefs.getInt('typeSelectLicenceIndex'));
-    print(prefs.getString('typeSelectLicence'));
-    print(prefs.getString('typeSelectLicenceLowerr'));
     setState(() {
       StateSelectStatus = prefs.getInt('stateSelectStatus');
       TypeSelectStatus = prefs.getInt('typeSelectStatus');

@@ -8,6 +8,9 @@ import 'package:http/http.dart' as http;
 import 'package:flutter_webview_plugin/flutter_webview_plugin.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../ad_helper.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
+
 class testListPage extends StatefulWidget {
   final int stateIndex;
   final String stateAbbr;
@@ -98,6 +101,10 @@ class _testListPageState extends State<testListPage> {
 
   int _getTestListStatus = -1;
 
+  NativeAd? _ad;
+  int _adError = 0;
+  bool _nativeAdIsLoaded = false;
+
   Future getStateList() async {
     String url = 'https://api-dmv.silversiri.com/getStateList';
     var res = await http.post(Uri.parse(url));
@@ -158,6 +165,12 @@ class _testListPageState extends State<testListPage> {
   }
 
   @override
+  void dispose() {
+    _ad?.dispose();
+    super.dispose();
+  }
+
+  @override
   void initState() {
     getStateList();
     stateIndex = widget.stateIndex;
@@ -172,12 +185,28 @@ class _testListPageState extends State<testListPage> {
     cur_state_index = stateIndex;
     cur_type_index = licenceIndex;
     cur_test_index = testIndex;
-    // print(stateIndex);
-    // print(stateAbbr);
-    // print(stateValue);
-    // print(stateSlug);
-    // print(licence);
-    // print(licenceLower);
+
+    NativeAd(
+      adUnitId: AdHelper.nativeAdUnitId,
+      factoryId: 'fullTile',
+      request: AdRequest(),
+      listener: NativeAdListener(
+        onAdLoaded: (ad) {
+          setState(() {
+            _ad = ad as NativeAd;
+          });
+        },
+        onAdFailedToLoad: (ad, error) {
+          // Releases an ad resource when it fails to load
+          ad.dispose();
+          setState(() {
+            _adError = error.code;
+          });
+          debugPrint(
+              'Ad load failed (code=${error.code} message=${error.message})');
+        },
+      ),
+    ).load();
   }
 
   @override
@@ -194,174 +223,191 @@ class _testListPageState extends State<testListPage> {
           children: [
             _getTestListStatus == 200
                 ? Container(
-                    margin: EdgeInsets.only(top: statusBar + 88),
-                    child: Column(
-                      children: [
-                        Container(
-                            width: double.infinity,
-                            height: 280,
-                            margin: EdgeInsets.only(left: 16, right: 16),
-                            padding: EdgeInsets.fromLTRB(16, 20, 16, 16),
-                            decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(4),
-                                color: Colors.white),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  "$stateValue Driver's Examination",
-                                  style: TextStyle(
-                                    fontFamily: 'GoogleSans-Medium',
-                                    fontSize: 14,
-                                  ),
-                                ),
-                                Text(
-                                  "(From the 2021 $stateValue driver handbook)",
-                                  style: TextStyle(
-                                    fontFamily: 'GoogleSans-Regular',
-                                    fontSize: 12,
-                                    color: Colors.grey,
-                                  ),
-                                ),
-                                Padding(
-                                  padding: EdgeInsets.only(top: 16, bottom: 16),
-                                  child: Text(
-                                    "$TestSumNum tests",
-                                    style: TextStyle(
-                                      fontFamily: 'GoofleSans-Regular',
-                                      fontSize: 16,
-                                    ),
-                                  ),
-                                ),
-                                Divider(
-                                  height: 2,
-                                  color: Colors.grey,
-                                ),
-                                Padding(
-                                  padding: EdgeInsets.only(top: 20, bottom: 20),
-                                  child: Text(
-                                    testValue,
-                                    style: TextStyle(
-                                      fontFamily: 'GoogleSans-Bold',
-                                      fontSize: 22,
-                                    ),
-                                  ),
-                                ),
-                                Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
+                    margin: EdgeInsets.only(top: statusBar + 38),
+                    child: ScrollConfiguration(
+                        behavior: MyBehavior(),
+                        child: ListView(
+                          children: <Widget>[
+                            Container(
+                                width: double.infinity,
+                                height: 280,
+                                margin: EdgeInsets.only(left: 16, right: 16),
+                                padding: EdgeInsets.fromLTRB(16, 20, 16, 16),
+                                decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(4),
+                                    color: Colors.white),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    Container(
-                                      width: 152,
-                                      // constraints:BoxConstraints(
-                                      //   minWidth:
-                                      // ),
-                                      padding:
-                                          EdgeInsets.fromLTRB(24, 12, 24, 8),
-                                      decoration: BoxDecoration(
-                                          borderRadius:
-                                              BorderRadius.circular(4),
-                                          color: Color(0xffe8f0fe)),
-                                      child: Column(children: [
-                                        Text('Numbers of questions',
-                                            style: TextStyle(
-                                              fontFamily: 'GoogleSans-Medium',
-                                              fontSize: 12,
-                                            ),
-                                            textAlign: TextAlign.center),
-                                        Padding(
-                                          padding:
-                                              const EdgeInsets.only(top: 8),
-                                          child: Text(
-                                            '$TestQueNum',
-                                            style: TextStyle(
-                                              fontFamily: 'GoogleSans-Bold',
-                                              fontSize: 22,
-                                              color: Color(0xff255dd9),
-                                            ),
-                                          ),
-                                        ),
-                                      ]),
+                                    Text(
+                                      "$stateValue Driver's Examination",
+                                      style: TextStyle(
+                                        fontFamily: 'GoogleSans-Medium',
+                                        fontSize: 14,
+                                      ),
                                     ),
-                                    Container(
-                                      width: 152,
-                                      padding:
-                                          EdgeInsets.fromLTRB(48, 12, 48, 8),
-                                      decoration: BoxDecoration(
-                                          borderRadius:
-                                              BorderRadius.circular(4),
-                                          color: Color(0xffe8f0fe)),
-                                      child: Column(children: [
-                                        Text('Passing score',
-                                            style: TextStyle(
-                                              fontFamily: 'GoogleSans-Medium',
-                                              fontSize: 12,
-                                            ),
-                                            textAlign: TextAlign.center),
-                                        Padding(
-                                          padding:
-                                              const EdgeInsets.only(top: 8),
-                                          child: Text(
-                                            '$TestPassNum',
-                                            style: TextStyle(
-                                              fontFamily: 'GoogleSans-Bold',
-                                              fontSize: 22,
-                                              color: Color(0xff255dd9),
-                                            ),
-                                          ),
-                                        ),
-                                      ]),
+                                    Text(
+                                      "(From the 2021 $stateValue driver handbook)",
+                                      style: TextStyle(
+                                        fontFamily: 'GoogleSans-Regular',
+                                        fontSize: 12,
+                                        color: Colors.grey,
+                                      ),
                                     ),
+                                    Padding(
+                                      padding:
+                                          EdgeInsets.only(top: 16, bottom: 16),
+                                      child: Text(
+                                        "$TestSumNum tests",
+                                        style: TextStyle(
+                                          fontFamily: 'GoofleSans-Regular',
+                                          fontSize: 16,
+                                        ),
+                                      ),
+                                    ),
+                                    Divider(
+                                      height: 2,
+                                      color: Colors.grey,
+                                    ),
+                                    Padding(
+                                      padding:
+                                          EdgeInsets.only(top: 20, bottom: 20),
+                                      child: Text(
+                                        testValue,
+                                        style: TextStyle(
+                                          fontFamily: 'GoogleSans-Bold',
+                                          fontSize: 22,
+                                        ),
+                                      ),
+                                    ),
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Container(
+                                          width: 152,
+                                          // constraints:BoxConstraints(
+                                          //   minWidth:
+                                          // ),
+                                          padding: EdgeInsets.fromLTRB(
+                                              24, 12, 24, 8),
+                                          decoration: BoxDecoration(
+                                              borderRadius:
+                                                  BorderRadius.circular(4),
+                                              color: Color(0xffe8f0fe)),
+                                          child: Column(children: [
+                                            Text('Numbers of questions',
+                                                style: TextStyle(
+                                                  fontFamily:
+                                                      'GoogleSans-Medium',
+                                                  fontSize: 12,
+                                                ),
+                                                textAlign: TextAlign.center),
+                                            Padding(
+                                              padding:
+                                                  const EdgeInsets.only(top: 8),
+                                              child: Text(
+                                                '$TestQueNum',
+                                                style: TextStyle(
+                                                  fontFamily: 'GoogleSans-Bold',
+                                                  fontSize: 22,
+                                                  color: Color(0xff255dd9),
+                                                ),
+                                              ),
+                                            ),
+                                          ]),
+                                        ),
+                                        Container(
+                                          width: 152,
+                                          padding: EdgeInsets.fromLTRB(
+                                              48, 12, 48, 8),
+                                          decoration: BoxDecoration(
+                                              borderRadius:
+                                                  BorderRadius.circular(4),
+                                              color: Color(0xffe8f0fe)),
+                                          child: Column(children: [
+                                            Text('Passing score',
+                                                style: TextStyle(
+                                                  fontFamily:
+                                                      'GoogleSans-Medium',
+                                                  fontSize: 12,
+                                                ),
+                                                textAlign: TextAlign.center),
+                                            Padding(
+                                              padding:
+                                                  const EdgeInsets.only(top: 8),
+                                              child: Text(
+                                                '$TestPassNum',
+                                                style: TextStyle(
+                                                  fontFamily: 'GoogleSans-Bold',
+                                                  fontSize: 22,
+                                                  color: Color(0xff255dd9),
+                                                ),
+                                              ),
+                                            ),
+                                          ]),
+                                        ),
+                                      ],
+                                    )
                                   ],
-                                )
-                              ],
-                            )),
-                        InkWell(
-                          onTap: () {
-                            print(TestUrl);
-                            Navigator.pushReplacement(context,
-                                MaterialPageRoute(builder: (context) {
-                              // return WebView(
-                              //   initialUrl: 'https://www.dmv-test-pro.com',
-                              // );
-                              return MaterialApp(
-                                title: 'Welcome to DMV',
-                                theme: ThemeData(
-                                    primarySwatch: Colors.green,
-                                    primaryColor: Colors.white),
-                                routes: {
-                                  "/": (_) => WebviewScaffold(
-                                      url: TestUrl,
-                                      appBar: PreferredSize(
-                                          // child: AppBar(), preferredSize: const Size.fromHeight(0.0))),
-                                          child: AppBar(
-                                            backgroundColor: Colors.white,
-                                          ),
-                                          preferredSize: Size.fromHeight(0.0))),
-                                },
-                                debugShowCheckedModeBanner: false,
-                              );
-                            }));
-                          },
-                          child: Container(
-                              height: 48,
-                              width: 200,
-                              margin: EdgeInsets.only(top: 48),
-                              decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(4),
-                                  color: Color(0xff255dd9)),
-                              child: Center(
-                                child: Text(
-                                  'Start',
-                                  style: TextStyle(
-                                      color: Colors.white,
-                                      fontFamily: 'GoogleSans-Bold',
-                                      fontSize: 18),
-                                ),
-                              )),
-                        )
-                      ],
-                    ))
+                                )),
+                            _ad != null || _adError != 0
+                                ? Container(
+                                    // height: 420,
+                                    height: 260,
+                                    margin: EdgeInsets.fromLTRB(4, 16, 4, 0),
+                                    // margin: const EdgeInsets.only(top: 36)
+                                    alignment: Alignment.center,
+                                    child: AdWidget(ad: _ad!))
+                                : Text(''),
+                            InkWell(
+                              onTap: () {
+                                // print(TestUrl);
+                                Navigator.pushReplacement(context,
+                                    MaterialPageRoute(builder: (context) {
+                                  // return WebView(
+                                  //   initialUrl: 'https://www.dmv-test-pro.com',
+                                  // );
+                                  return MaterialApp(
+                                    routes: {
+                                      "/": (_) => WebviewScaffold(
+                                          url: TestUrl,
+                                          appBar: PreferredSize(
+                                              // child: AppBar(), preferredSize: const Size.fromHeight(0.0))),
+                                              child: AppBar(
+                                                backgroundColor: Colors.white,
+                                              ),
+                                              preferredSize:
+                                                  Size.fromHeight(0.0))),
+                                    },
+                                    debugShowCheckedModeBanner: false,
+                                  );
+                                }));
+                              },
+                              child: Container(
+                                  height: 48,
+                                  width: 200,
+                                  margin: EdgeInsets.only(
+                                    top: 24,
+                                    left: 100,
+                                    right: 100,
+                                    bottom: 24,
+                                  ),
+                                  decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(4),
+                                      color: Color(0xff255dd9)),
+                                  child: Center(
+                                    child: Text(
+                                      'Start',
+                                      style: TextStyle(
+                                          color: Colors.white,
+                                          fontFamily: 'GoogleSans-Bold',
+                                          fontSize: 18),
+                                    ),
+                                  )),
+                            ),
+                          ],
+                        )))
                 : _loadDownloadWidget(),
             Container(
                 height: 56,
