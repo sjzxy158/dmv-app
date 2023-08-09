@@ -1,9 +1,5 @@
 import 'dart:io';
 
-import 'package:app/page/state_list.dart';
-import 'package:app/page/type.dart';
-import 'package:app/page/test_list.dart';
-
 import 'package:flutter/material.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -11,6 +7,11 @@ import '../ad_helper.dart';
 import 'package:flutter_webview_plugin/flutter_webview_plugin.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+import 'package:app/page/state_list.dart';
+import 'package:app/page/type.dart';
+import 'package:app/page/test_list.dart';
+import 'package:app/page/tab_navigator.dart';
 
 class StartPage extends StatefulWidget {
   // final String? lang;
@@ -102,7 +103,7 @@ class _StartPage extends State<StartPage> {
                             // );
                             return StateSelectStatus == 1 &&
                                     TypeSelectStatus == 1
-                                ? testListPage(
+                                ? TabNavigator(
                                     stateIndex: stateIndex,
                                     stateAbbr: stateAbbr,
                                     stateValue: stateValue,
@@ -111,7 +112,10 @@ class _StartPage extends State<StartPage> {
                                     licence: licence,
                                     licenceLower: licenceLower,
                                   )
-                                : StateListPage();
+                                : StateListPage(
+                                    backVisible: false, currentStateIndex: -1);
+                            // TabNavigator();
+
                             // ;
                             // return TypeSelectPage();
                             // return MaterialApp(
@@ -192,7 +196,9 @@ class _StartPage extends State<StartPage> {
                                           licence: licence,
                                           licenceLower: licenceLower,
                                         )
-                                      : StateListPage();
+                                      : StateListPage(
+                                          backVisible: false,
+                                          currentStateIndex: -1);
                                   // return TypeSelectPage();
                                   // return MaterialApp(
                                   //   title: 'Welcome to DMV',

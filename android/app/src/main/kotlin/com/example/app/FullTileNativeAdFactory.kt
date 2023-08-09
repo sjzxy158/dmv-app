@@ -21,20 +21,20 @@ class FullTileAdFactory(val context: Context) : GoogleMobileAdsPlugin.NativeAdFa
                 .inflate(R.layout.full_tile_native_ad, null) as NativeAdView
 
         with(nativeAdView) {
-            val attributionViewSmall =
-                    findViewById<TextView>(R.id.tv_full_tile_native_ad_attribution_small)
-            val attributionViewLarge =
-                    findViewById<TextView>(R.id.tv_full_tile_native_ad_attribution_large)
+            // val attributionViewSmall =
+            //         findViewById<TextView>(R.id.tv_full_tile_native_ad_attribution_small)
+            // val attributionViewLarge =
+            //         findViewById<TextView>(R.id.tv_full_tile_native_ad_attribution_large)
 
             // val iconView = findViewById<ImageView>(R.id.iv_full_tile_native_ad_icon)
             val icon = nativeAd.icon
             if (icon != null) {
-                attributionViewSmall.visibility = View.VISIBLE
-                attributionViewLarge.visibility = View.INVISIBLE
+                // attributionViewSmall.visibility = View.VISIBLE
+                // attributionViewLarge.visibility = View.INVISIBLE
                 // iconView.setImageDrawable(icon.drawable)
             } else {
-                attributionViewSmall.visibility = View.INVISIBLE
-                attributionViewLarge.visibility = View.VISIBLE
+                // attributionViewSmall.visibility = View.INVISIBLE
+                // attributionViewLarge.visibility = View.VISIBLE
             }
             // this.iconView = iconView
 

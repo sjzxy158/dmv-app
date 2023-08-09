@@ -354,7 +354,7 @@ class _testListPageState extends State<testListPage> {
                             _ad != null || _adError != 0
                                 ? Container(
                                     // height: 420,
-                                    height: 260,
+                                    height: 248,
                                     margin: EdgeInsets.fromLTRB(4, 16, 4, 0),
                                     // margin: const EdgeInsets.only(top: 36)
                                     alignment: Alignment.center,
@@ -388,7 +388,7 @@ class _testListPageState extends State<testListPage> {
                                   height: 48,
                                   width: 200,
                                   margin: EdgeInsets.only(
-                                    top: 24,
+                                    top: 12,
                                     left: 100,
                                     right: 100,
                                     bottom: 24,

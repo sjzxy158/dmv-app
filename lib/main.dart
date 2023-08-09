@@ -3,11 +3,11 @@ import 'package:flutter/services.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import './app_open_ad_manager.dart';
 import './app_lifecycle_rector.dart';
-import 'page/start.dart';
-// import 'package:flutter_webview_plugin/flutter_webview_plugin.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
+
+import 'page/start.dart';
 
 // List<String> testDeviceIds = ['2C3672609B2CB70494C68A2DD3D5C79F'];
 // void main() {

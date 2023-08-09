@@ -22,7 +22,7 @@
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="24dp">
+                android:layout_marginTop="0dp">
 
                 <com.google.android.gms.ads.nativead.MediaView
                     android:id="@+id/ad_media"
@@ -30,7 +30,7 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_horizontal"/>
 
-                <TextView
+                <!-- <TextView
                     android:id="@+id/tv_full_tile_native_ad_attribution_small"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -56,7 +56,7 @@
                     android:gravity="center"
                     android:text="Ad"
                     android:textColor="#FFFFFF"
-                    android:visibility="invisible" />
+                    android:visibility="invisible" /> -->
 
 
             </RelativeLayout>

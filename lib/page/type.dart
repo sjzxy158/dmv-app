@@ -1,9 +1,13 @@
+import 'dart:math' as math;
+
 import 'package:app/page/test_list.dart';
 import 'package:flutter/material.dart';
 
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_webview_plugin/flutter_webview_plugin.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+import 'package:app/page/tab_navigator.dart';
 
 class TypeSelectPage extends StatefulWidget {
   final int stateIndex;
@@ -23,8 +27,10 @@ class TypeSelectPage extends StatefulWidget {
   _TypeSelectPageState createState() => _TypeSelectPageState();
 }
 
-// String licence = '';
-// String licenceLower = '';
+int licenceIndex = -1;
+String licence = '';
+String licenceLower = '';
+bool StartVisible = false;
 
 class _TypeSelectPageState extends State<TypeSelectPage> {
   int stateIndex = -1;
@@ -37,6 +43,7 @@ class _TypeSelectPageState extends State<TypeSelectPage> {
     stateAbbr = widget.stateAbbr;
     stateValue = widget.stateValue;
     stateSlug = widget.stateSlug;
+    print(stateIndex);
   }
 
   @override
@@ -46,20 +53,91 @@ class _TypeSelectPageState extends State<TypeSelectPage> {
         title: 'Home',
         home: Scaffold(
             appBar: AppBar(
-                title: Text(
-                  'Select type of Licence',
-                  style: TextStyle(color: Colors.white),
+              title: Text(
+                'Select type of Licence',
+                style: TextStyle(
+                    color: Colors.black,
+                    fontFamily: 'GoogleSans-Bold',
+                    fontSize: 24),
+              ),
+              toolbarHeight: 90,
+              centerTitle: true,
+              backgroundColor: Colors.white,
+              elevation: 0,
+              leading: GestureDetector(
+                  onTap: () {
+                    Navigator.pop(context);
+                  },
+                  child: Container(
+                    // decoration: BoxDecoration(color: Colors.red),
+                    margin: EdgeInsets.only(
+                      top: 36,
+                      bottom: 36,
+                    ),
+                    child: Transform.rotate(
+                        angle: math.pi,
+                        child: SvgPicture.asset(
+                          'images/go.svg',
+                        )),
+                  )),
+            ),
+            body: Stack(
+              children: <Widget>[
+                Container(
+                  width: double.infinity,
+                  height: double.infinity,
+                  decoration: BoxDecoration(color: Colors.white),
+                  child: Column(children: <Widget>[
+                    _typeItem('Car', 0, 600),
+                    _typeItem('Motorcycle', 1, 450),
+                    _typeItem('CDL', 2, 2500),
+                  ]),
                 ),
-                backgroundColor: Color(0xff255dd9)),
-            body: Container(
-              width: double.infinity,
-              height: double.infinity,
-              decoration: BoxDecoration(color: Color(0xffdddddd)),
-              child: Column(children: <Widget>[
-                _typeItem('Car', 0),
-                _typeItem('Motorcycle', 1),
-                _typeItem('CDL', 2),
-              ]),
+                Positioned(
+                    bottom: 24,
+                    left: 0,
+                    right: 0,
+                    child: InkWell(
+                      onTap: () {
+                        if (StartVisible) {
+                          _setTypeSelectStatus(
+                              licenceIndex, licence, licenceLower);
+                          Navigator.push(context,
+                              MaterialPageRoute(builder: (context) {
+                            return TabNavigator(
+                              stateIndex: stateIndex,
+                              stateAbbr: stateAbbr,
+                              stateValue: stateValue,
+                              stateSlug: stateSlug,
+                              licenceIndex: licenceIndex,
+                              licence: licence,
+                              licenceLower: licenceLower,
+                            );
+                          }));
+                        } else {
+                          return;
+                        }
+                      },
+                      child: Container(
+                          height: 56,
+                          alignment: Alignment.center,
+                          width: double.infinity,
+                          decoration: BoxDecoration(
+                            color: StartVisible
+                                ? Color(0xff255dd9)
+                                : Color(0xffbbbbbb),
+                            borderRadius: BorderRadius.circular(28),
+                          ),
+                          margin: EdgeInsets.only(left: 20, right: 20),
+                          child: Text(
+                            'Start',
+                            style: TextStyle(
+                                fontSize: 18,
+                                fontFamily: 'GoogleSans-Medium',
+                                color: Colors.white),
+                          )),
+                    ))
+              ],
             )));
   }
 
@@ -72,54 +150,70 @@ class _TypeSelectPageState extends State<TypeSelectPage> {
     await prefs.setString('typeSelectLicenceLowerr', licenceLower);
   }
 
-  _typeItem(String licence, int index) {
-    String licenceLower = licence.toLowerCase();
+  _typeItem(String type, int index, int quesNum) {
+    String licenceSlug = type.toLowerCase();
     return InkWell(
       onTap: () {
-        // 本地存储 licence
-        _setTypeSelectStatus(index, licence, licenceLower);
-        Navigator.push(context, MaterialPageRoute(builder: (context) {
-          return testListPage(
-            stateIndex: stateIndex,
-            stateAbbr: stateAbbr,
-            stateValue: stateValue,
-            stateSlug: stateSlug,
-            licenceIndex: index,
-            licence: licence,
-            licenceLower: licenceLower,
-          );
-        }));
+        setState(() {
+          StartVisible = true;
+          licenceIndex = index;
+          licence = type;
+          licenceLower = licence.toLowerCase();
+        });
       },
       child: Container(
-          height: 120,
+          height: 160,
           width: double.infinity,
-          margin: EdgeInsets.only(left: 16, right: 16, top: 32),
-          padding: EdgeInsets.only(left: 16),
+          margin: EdgeInsets.only(left: 20, right: 20, top: 16),
+          padding: EdgeInsets.only(left: 24),
           decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(4),
-          ),
+              color: Colors.white,
+              border: Border.all(
+                  width: 3,
+                  color: licenceIndex == index
+                      ? Color(0xff255dd9)
+                      : Colors.transparent),
+              borderRadius: BorderRadius.circular(12),
+              boxShadow: [
+                BoxShadow(
+                    color: const Color.fromRGBO(0, 0, 0, 0.06),
+                    offset: Offset(0.0, 0.0), //阴影xy轴偏移量
+                    blurRadius: 10.0, //阴影模糊程度
+                    spreadRadius: 12.0 //阴影扩散程度
+                    )
+              ]),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Container(
-                padding: EdgeInsets.only(top: 20, bottom: 20),
                 child: Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
                     Text(
-                      licence,
-                      style: TextStyle(fontFamily: 'GoogleSans-Regular'),
+                      type,
+                      style: TextStyle(
+                          fontSize: 22,
+                          fontFamily: 'GoogleSans-Medium',
+                          color: Colors.black),
                     ),
-                    SvgPicture.asset('images/go.svg', width: 16)
+                    Container(
+                      margin: EdgeInsets.only(top: 8),
+                      child: Text(
+                        '${quesNum} Questions',
+                        style: TextStyle(
+                            fontSize: 14,
+                            fontFamily: 'GoogleSans-Regular',
+                            color: Color(0xff999999)),
+                      ),
+                    )
                   ],
                 ),
               ),
               Image(
-                  width: 160,
-                  height: 160,
-                  image: AssetImage('images/$licenceLower.png'))
+                  width: 190,
+                  height: 200,
+                  image: AssetImage('images/$licenceSlug.png'))
             ],
           )),
     );
