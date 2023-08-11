@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 
 import 'package:flutter_svg/flutter_svg.dart';
 
+import 'package:app/page/tests/test_home.dart';
 import 'package:app/page/setting.dart';
 import 'package:app/page/handbook/handbook.dart';
 
@@ -71,7 +72,12 @@ class _TabNavigatorState extends State<TabNavigator> {
           controller: _controller,
           physics: const NeverScrollableScrollPhysics(),
           children: <Widget>[
-            HandbookPage(),
+            testHomePage(
+              stateAbbr: stateAbbr,
+              stateSlug: stateSlug,
+              licenceIndex: licenceIndex,
+              licenceLower: licenceLower,
+            ),
             HandbookPage(),
             SettingPage(),
           ],
@@ -94,6 +100,12 @@ class _TabNavigatorState extends State<TabNavigator> {
             selectedFontSize: 12,
             unselectedFontSize: 12,
             selectedItemColor: _activeColor,
+            selectedLabelStyle: TextStyle(
+              fontFamily: 'GoogleSans-Medium',
+            ),
+            unselectedLabelStyle: TextStyle(
+              fontFamily: 'GoogleSans-Medium',
+            ),
             items: [
               _bottomItem('DMV Tests', 'tests', 0),
               _bottomItem('Handbooks', 'handbook', 1),

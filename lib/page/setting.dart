@@ -44,9 +44,7 @@ class _SettingPageState extends State<SettingPage> {
             child: Text(
               'Settings',
               style: TextStyle(
-                  fontSize: 32,
-                  fontFamily: 'GoogleSans-Bold',
-                  color: Colors.black),
+                  fontSize: 32, fontFamily: 'Gilroy-Bold', color: Colors.black),
             ),
           ),
           Container(

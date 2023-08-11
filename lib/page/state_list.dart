@@ -30,10 +30,13 @@ String stateValue = '';
 String stateSlug = '';
 
 class _StateListPageState extends State<StateListPage> {
+  bool isInProduction = bool.fromEnvironment("dart.vm.product");
+
   bool backVisible = false;
   int _getStateListStatus = -1;
 
   Future getStateList() async {
+    // print(isInProduction);
     String url = 'https://api-dmv.silversiri.com/getStateList';
     var res = await http.post(Uri.parse(url));
     if (res.statusCode == 200) {
@@ -55,7 +58,6 @@ class _StateListPageState extends State<StateListPage> {
       stateIndex = widget.currentStateIndex;
       backVisible = widget.backVisible;
     });
-    print(stateIndex);
     getStateList();
   }
 
@@ -69,9 +71,7 @@ class _StateListPageState extends State<StateListPage> {
             title: Text(
               'Select your state',
               style: TextStyle(
-                  color: Colors.black,
-                  fontFamily: 'GoogleSans-Bold',
-                  fontSize: 24),
+                  color: Colors.black, fontFamily: 'Gilroy-Bold', fontSize: 24),
             ),
             toolbarHeight: 90,
             centerTitle: true,
@@ -175,12 +175,23 @@ class _StateDataListState extends State<StateDataList> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
-                STATE_LIST[index]["name"],
-                style: TextStyle(
-                  fontSize: 18,
-                  fontFamily: 'GoogleSans-Regular',
-                ),
+              Row(
+                children: [
+                  Image(
+                      width: 36,
+                      height: 24,
+                      image: AssetImage(
+                          "images/flags/${STATE_LIST[index]["slug"]}.png")),
+                  Container(
+                      margin: EdgeInsets.only(left: 16),
+                      child: Text(
+                        STATE_LIST[index]["name"],
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontFamily: 'GoogleSans-Regular',
+                        ),
+                      )),
+                ],
               ),
               Row(
                 children: [
