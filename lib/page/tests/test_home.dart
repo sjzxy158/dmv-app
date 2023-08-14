@@ -7,18 +7,19 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_webview_plugin/flutter_webview_plugin.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../ad_helper.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
+import 'package:app/page/tests/test_list.dart';
+import 'package:app/page/tests/roadsign_list.dart';
 
-class testHomePage extends StatefulWidget {
+class TestHomePage extends StatefulWidget {
   final String stateAbbr;
   final String stateSlug;
   final int licenceIndex;
   final String licenceLower;
 
-  const testHomePage({
+  const TestHomePage({
     Key? key,
     required this.stateAbbr,
     required this.stateSlug,
@@ -27,7 +28,7 @@ class testHomePage extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  _testHomePageState createState() => _testHomePageState();
+  _TestHomePageState createState() => _TestHomePageState();
 }
 
 List TEST_LIST = [];
@@ -36,12 +37,13 @@ List ROADSIGN_LIST = [];
 int cur_type_index = -1;
 String select_test_url = '';
 
-class _testHomePageState extends State<testHomePage>
+class _TestHomePageState extends State<TestHomePage>
     with AutomaticKeepAliveClientMixin {
   String stateAbbr = '';
   String stateSlug = '';
   int licenceIndex = -1;
   String licenceLower = '';
+  int testListLength = 0;
 
   int _getTestListStatus = -1;
   int _getRognSignListStatus = -1;
@@ -62,6 +64,7 @@ class _testHomePageState extends State<testHomePage>
       // print(body['data']);
       setState(() {
         TEST_LIST = body['data'];
+        testListLength = TEST_LIST.length;
         _getTestListStatus = res.statusCode;
       });
       // _setListStatus(TEST_LIST);
@@ -99,7 +102,6 @@ class _testHomePageState extends State<testHomePage>
     getRoadSignList();
     DateTime now = DateTime.now();
     int hour = now.hour;
-    print(hour);
     setState(() {
       if (hour > 6 && hour <= 11) {
         homeTitle = 'Good Morning';
@@ -109,14 +111,6 @@ class _testHomePageState extends State<testHomePage>
         homeTitle = 'Good Evening';
       }
     });
-
-    // if (loadedStatus) {
-    //   _getListStatus();
-    // } else {
-    //   getTestList();
-    //   getRoadSignList();
-    // }
-
     cur_type_index = licenceIndex;
     NativeAd(
       adUnitId: AdHelper.nativeAdUnitId,
@@ -193,7 +187,7 @@ class _testHomePageState extends State<testHomePage>
                             child: Column(
                               children: <Widget>[
                                 Container(
-                                  margin: EdgeInsets.only(left: 20, right: 20),
+                                  margin: EdgeInsets.only(left: 20),
                                   child: Row(
                                       mainAxisAlignment:
                                           MainAxisAlignment.spaceBetween,
@@ -204,10 +198,33 @@ class _testHomePageState extends State<testHomePage>
                                               fontFamily: 'Gilroy-Bold',
                                               fontSize: 22),
                                         ),
-                                        SvgPicture.asset(
-                                          'images/go.svg',
-                                          width: 16,
-                                          color: Color(0xffcccccc),
+                                        InkWell(
+                                          onTap: () {
+                                            Navigator.push(context,
+                                                MaterialPageRoute(
+                                                    builder: (context) {
+                                              return TestListPage(
+                                                stateAbbr: stateAbbr,
+                                                stateSlug: stateSlug,
+                                                licenceIndex: licenceIndex,
+                                                licenceLower: licenceLower,
+                                              );
+                                            }));
+                                          },
+                                          child: Container(
+                                            width: 68,
+                                            height: 24,
+                                            alignment: Alignment.centerRight,
+                                            padding: EdgeInsets.only(
+                                                left: 32, right: 20),
+                                            // decoration: BoxDecoration(
+                                            //     color: Colors.red),
+                                            child: SvgPicture.asset(
+                                              'images/go.svg',
+                                              width: 16,
+                                              color: Color(0xffcccccc),
+                                            ),
+                                          ),
                                         )
                                       ]),
                                 ),
@@ -232,7 +249,7 @@ class _testHomePageState extends State<testHomePage>
                             child: Column(
                               children: <Widget>[
                                 Container(
-                                  margin: EdgeInsets.only(left: 20, right: 20),
+                                  margin: EdgeInsets.only(left: 20),
                                   child: Row(
                                       mainAxisAlignment:
                                           MainAxisAlignment.spaceBetween,
@@ -243,10 +260,33 @@ class _testHomePageState extends State<testHomePage>
                                               fontFamily: 'Gilroy-Bold',
                                               fontSize: 22),
                                         ),
-                                        SvgPicture.asset(
-                                          'images/go.svg',
-                                          width: 16,
-                                          color: Color(0xffcccccc),
+                                        InkWell(
+                                          onTap: () {
+                                            Navigator.push(context,
+                                                MaterialPageRoute(
+                                                    builder: (context) {
+                                              return RoadSignListPage(
+                                                stateAbbr: stateAbbr,
+                                                stateSlug: stateSlug,
+                                                licenceIndex: licenceIndex,
+                                                licenceLower: licenceLower,
+                                              );
+                                            }));
+                                          },
+                                          child: Container(
+                                            width: 68,
+                                            height: 24,
+                                            alignment: Alignment.centerRight,
+                                            padding: EdgeInsets.only(
+                                                left: 32, right: 20),
+                                            // decoration: BoxDecoration(
+                                            //     color: Colors.red),
+                                            child: SvgPicture.asset(
+                                              'images/go.svg',
+                                              width: 16,
+                                              color: Color(0xffcccccc),
+                                            ),
+                                          ),
                                         )
                                       ]),
                                 ),
@@ -455,7 +495,6 @@ class _RoadSignListState extends State<RoadSignList> {
                       ),
                     ),
                     Container(
-                      margin: EdgeInsets.only(top: 2),
                       child: Text(
                         '${ROADSIGN_LIST[index]['question_num']} Questions',
                         style: TextStyle(
