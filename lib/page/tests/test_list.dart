@@ -6,7 +6,7 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:http/http.dart' as http;
-import 'package:flutter_webview_plugin/flutter_webview_plugin.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
 
 import '../../ad_helper.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
@@ -97,12 +97,20 @@ class _TestListPageState extends State<TestListPage> {
         },
       ),
     ).load();
+    // _testSetCurrentScreen();
   }
 
   @override
   void dispose() {
     _ad?.dispose();
     super.dispose();
+  }
+
+  Future<void> _testSetCurrentScreen() async {
+    await FirebaseAnalytics.instance.setCurrentScreen(
+      screenName: 'Test List',
+      screenClassOverride: 'Test List',
+    );
   }
 
   @override

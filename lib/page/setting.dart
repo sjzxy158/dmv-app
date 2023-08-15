@@ -3,6 +3,7 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
 
 import 'package:app/page/state_list.dart';
 import 'package:app/page/type.dart';
@@ -26,6 +27,14 @@ class _SettingPageState extends State<SettingPage> {
   @override
   void initState() {
     _getStateAndTypeSelectStatus();
+    // _testSetCurrentScreen();
+  }
+
+  Future<void> _testSetCurrentScreen() async {
+    await FirebaseAnalytics.instance.setCurrentScreen(
+      screenName: 'Settings',
+      screenClassOverride: 'Settings',
+    );
   }
 
   @override

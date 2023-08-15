@@ -6,7 +6,6 @@ import 'package:flutter/material.dart';
 import 'package:app/page/type.dart';
 
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:flutter_webview_plugin/flutter_webview_plugin.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 

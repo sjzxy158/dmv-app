@@ -6,7 +6,7 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:http/http.dart' as http;
-import 'package:flutter_webview_plugin/flutter_webview_plugin.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
 
 import '../../ad_helper.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
@@ -68,6 +68,14 @@ class _RoadSignListPageState extends State<RoadSignListPage> {
     licenceIndex = widget.licenceIndex;
     licenceLower = widget.licenceLower;
     getRoadSignList();
+    // _testSetCurrentScreen();
+  }
+
+  Future<void> _testSetCurrentScreen() async {
+    await FirebaseAnalytics.instance.setCurrentScreen(
+      screenName: 'RoadSign List',
+      screenClassOverride: 'RoadSign List',
+    );
   }
 
   @override

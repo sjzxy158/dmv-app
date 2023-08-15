@@ -6,6 +6,8 @@ import './app_lifecycle_rector.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
+import 'package:permission_handler/permission_handler.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'page/start.dart';
 
@@ -75,13 +77,38 @@ class MyAppContentState extends State<MyAppContent> {
         .addObserver(AppLifecycleReactor(appOpenAdManager: appOpenAdManager));
 
     _testSetCurrentScreen();
+    _requestNotificationPermission();
   }
 
+  // 屏幕访问
   Future<void> _testSetCurrentScreen() async {
     await widget.analytics.setCurrentScreen(
       screenName: 'Home Page',
       screenClassOverride: 'HomePage',
     );
+  }
+
+  // 推送权限
+  Future<void> _requestNotificationPermission() async {
+    //  请求推送授权
+    PermissionStatus status = await Permission.notification.request();
+    if (status.isGranted) {
+      // 用户已授权推送权限
+    } else {
+      // 用户拒绝了推送权限
+    }
+  }
+
+  // 获取用户 id
+  Future<void> _getUsetSubscribeInfo() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String uid = prefs.getString('uid') ?? '';
+
+    // if (uid == '') {
+    //   String result = await sendSubscribe(fcmToken, languageCode, countryCode,
+    //       packageInfo.version, phoneInfo, timeZoneOffsetString);
+    //   await prefs.setString('uid', result);
+    // }
   }
 
   // This widget is the root of your application.
@@ -115,33 +142,3 @@ class MyAppContentState extends State<MyAppContent> {
     );
   }
 }
-
-// void main() {
-//   runApp(const MyApp());
-// }
-
-// class MyApp extends StatelessWidget {
-//   const MyApp({Key? key}) : super(key: key);
-
-//   // This widget is the root of your application.
-//   @override
-  // Widget build(BuildContext context) {
-  //   return MaterialApp(
-  //     title: 'Welcome to DMV',
-  //     theme: ThemeData(primarySwatch: Colors.green, primaryColor: Colors.white),
-  //     routes: {
-  //       "/": (_) => WebviewScaffold(
-  //           // url: "https://www.menuwithnutrition.com/",
-  //           // url: "https://dmv.silversiri.com",
-  //           url: "https://www.dmv-test-pro.com",
-  //           appBar: PreferredSize(
-  //               // child: AppBar(), preferredSize: const Size.fromHeight(0.0))),
-  //               child: AppBar(
-  //                 backgroundColor: Colors.white,
-  //               ),
-  //               preferredSize: Size.fromHeight(0.0))),
-  //     },
-  //     debugShowCheckedModeBanner: false,
-  //   );
-//   }
-// }

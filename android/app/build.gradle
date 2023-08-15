@@ -31,7 +31,7 @@ def keystoreProperties = new Properties()
 keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
 
 android {
-    compileSdkVersion 31
+    compileSdkVersion 33
 
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
@@ -50,7 +50,7 @@ android {
         // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
         applicationId "com.dmv.app"
         minSdkVersion 21
-        targetSdkVersion 31
+        targetSdkVersion 33
         // versionCode flutterVersionCode.toInteger()
         // versionName flutterVersionName
         versionCode 14

@@ -7,6 +7,8 @@ import 'package:app/page/tests/test_home.dart';
 import 'package:app/page/setting.dart';
 import 'package:app/page/handbook/handbook.dart';
 
+import 'package:firebase_analytics/firebase_analytics.dart';
+
 class TabNavigator extends StatefulWidget {
   final int stateIndex;
   final String stateAbbr;
@@ -47,6 +49,8 @@ class _TabNavigatorState extends State<TabNavigator> {
   String licence = '';
   String licenceLower = '';
 
+  FirebaseAnalytics analytics = FirebaseAnalytics.instance;
+
   @override
   void initState() {
     stateIndex = widget.stateIndex;
@@ -56,13 +60,14 @@ class _TabNavigatorState extends State<TabNavigator> {
     licenceIndex = widget.licenceIndex;
     licence = widget.licence;
     licenceLower = widget.licenceLower;
-    print(stateIndex);
-    print(stateAbbr);
-    print(stateValue);
-    print(stateSlug);
-    print(licenceIndex);
-    print(licence);
-    print(licenceLower);
+    _testSetCurrentScreen();
+  }
+
+  Future<void> _testSetCurrentScreen() async {
+    await FirebaseAnalytics.instance.setCurrentScreen(
+      screenName: 'Tab Navigator',
+      screenClassOverride: 'Tab Navigator',
+    );
   }
 
   @override

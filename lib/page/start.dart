@@ -4,13 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import '../ad_helper.dart';
-import 'package:flutter_webview_plugin/flutter_webview_plugin.dart';
-import 'package:webview_flutter/webview_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:app/page/state_list.dart';
 import 'package:app/page/type.dart';
-import 'package:app/page/test_list.dart';
 import 'package:app/page/tab_navigator.dart';
 
 class StartPage extends StatefulWidget {
@@ -49,7 +46,6 @@ class _StartPage extends State<StartPage> {
   @override
   void initState() {
     super.initState();
-    if (Platform.isAndroid) WebView.platform = AndroidWebView();
     // lang = widget.lang;
     NativeAd(
       adUnitId: AdHelper.nativeFullScreenAdUnitId,
@@ -114,29 +110,6 @@ class _StartPage extends State<StartPage> {
                                   )
                                 : StateListPage(
                                     backVisible: false, currentStateIndex: -1);
-                            // TabNavigator();
-
-                            // ;
-                            // return TypeSelectPage();
-                            // return MaterialApp(
-                            //   title: 'Welcome to DMV',
-                            //   theme: ThemeData(
-                            //       primarySwatch: Colors.green,
-                            //       primaryColor: Colors.white),
-                            //   routes: {
-                            //     "/": (_) => WebviewScaffold(
-                            //         // url: "https://www.menuwithnutrition.com/",
-                            //         // url: "https://dmv.silversiri.com",
-                            //         url: "https://www.dmv-test-pro.com",
-                            //         appBar: PreferredSize(
-                            //             // child: AppBar(), preferredSize: const Size.fromHeight(0.0))),
-                            //             child: AppBar(
-                            //               backgroundColor: Colors.white,
-                            //             ),
-                            //             preferredSize: Size.fromHeight(0.0))),
-                            //   },
-                            //   debugShowCheckedModeBanner: false,
-                            // );
                           }));
                         },
                         child: SizedBox(
@@ -187,7 +160,7 @@ class _StartPage extends State<StartPage> {
                                   // );
                                   return StateSelectStatus == 1 &&
                                           TypeSelectStatus == 1
-                                      ? testListPage(
+                                      ? TabNavigator(
                                           stateIndex: stateIndex,
                                           stateAbbr: stateAbbr,
                                           stateValue: stateValue,
@@ -199,27 +172,6 @@ class _StartPage extends State<StartPage> {
                                       : StateListPage(
                                           backVisible: false,
                                           currentStateIndex: -1);
-                                  // return TypeSelectPage();
-                                  // return MaterialApp(
-                                  //   title: 'Welcome to DMV',
-                                  //   theme: ThemeData(
-                                  //       primarySwatch: Colors.green,
-                                  //       primaryColor: Colors.white),
-                                  //   routes: {
-                                  //     "/": (_) => WebviewScaffold(
-                                  //         // url: "https://www.menuwithnutrition.com/",
-                                  //         // url: "https://dmv.silversiri.com",
-                                  //         url: "https://www.dmv-test-pro.com",
-                                  //         appBar: PreferredSize(
-                                  //             // child: AppBar(), preferredSize: const Size.fromHeight(0.0))),
-                                  //             child: AppBar(
-                                  //               backgroundColor: Colors.white,
-                                  //             ),
-                                  //             preferredSize:
-                                  //                 Size.fromHeight(0.0))),
-                                  //   },
-                                  //   debugShowCheckedModeBanner: false,
-                                  // );
                                 }));
                               }
                               if (_ad != null) {

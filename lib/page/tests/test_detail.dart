@@ -3,7 +3,8 @@ import 'dart:math' as math;
 
 import '../../ad_helper.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
-import 'package:flutter_webview_plugin/flutter_webview_plugin.dart';
+import 'package:webview_flutter/webview_flutter.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -44,6 +45,7 @@ class _TestDetailPageState extends State<TestDetailPage> {
     qualifying_num = widget.qualifying_num;
     percent = widget.percent;
     select_test_url = widget.select_test_url;
+    if (Platform.isAndroid) WebView.platform = AndroidWebView();
 
     NativeAd(
       adUnitId: AdHelper.nativeAdUnitId,
@@ -66,12 +68,20 @@ class _TestDetailPageState extends State<TestDetailPage> {
         },
       ),
     ).load();
+    // _testSetCurrentScreen();
   }
 
   @override
   void dispose() {
     _ad?.dispose();
     super.dispose();
+  }
+
+  Future<void> _testSetCurrentScreen() async {
+    await FirebaseAnalytics.instance.setCurrentScreen(
+      screenName: 'Test Detail',
+      screenClassOverride: 'Test Detail',
+    );
   }
 
   @override
@@ -91,19 +101,30 @@ class _TestDetailPageState extends State<TestDetailPage> {
                 right: 0,
                 child: InkWell(
                   onTap: () {
+                    // Navigator.pushReplacement(context,
+                    //     MaterialPageRoute(builder: (context) {
+                    //   return MaterialApp(
+                    //     routes: {
+                    //       "/": (_) => WebviewScaffold(
+                    //           url: select_test_url,
+                    //           appBar: PreferredSize(
+                    //               child: AppBar(
+                    //                 backgroundColor: Colors.white,
+                    //               ),
+                    //               preferredSize: Size.fromHeight(0.0))),
+                    //     },
+                    //     debugShowCheckedModeBanner: false,
+                    //   );
+                    // }));
                     Navigator.pushReplacement(context,
                         MaterialPageRoute(builder: (context) {
-                      return MaterialApp(
-                        routes: {
-                          "/": (_) => WebviewScaffold(
-                              url: select_test_url,
-                              appBar: PreferredSize(
-                                  child: AppBar(
-                                    backgroundColor: Colors.white,
-                                  ),
-                                  preferredSize: Size.fromHeight(0.0))),
-                        },
-                        debugShowCheckedModeBanner: false,
+                      return Scaffold(
+                        body: Container(
+                          margin: EdgeInsets.only(top: statusBar),
+                          child: WebView(
+                            initialUrl: select_test_url,
+                          ),
+                        ),
                       );
                     }));
                   },
