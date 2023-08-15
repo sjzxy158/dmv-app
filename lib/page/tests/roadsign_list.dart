@@ -12,6 +12,7 @@ import '../../ad_helper.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 import 'package:app/page/tests/test_home.dart';
+import 'package:app/page/tests/roadsign_detail.dart';
 
 class RoadSignListPage extends StatefulWidget {
   final String stateAbbr;
@@ -201,20 +202,13 @@ class _RoadSignListState extends State<RoadSignList> {
       onTap: () {
         String road_sign_url =
             'https://www.dmv-test-pro.com/road-sign-test/${ROADSIGN_LIST[index]['slug']}';
-        Navigator.pushReplacement(context,
-            MaterialPageRoute(builder: (context) {
-          return MaterialApp(
-            routes: {
-              "/": (_) => WebviewScaffold(
-                  url: road_sign_url,
-                  appBar: PreferredSize(
-                      // child: AppBar(), preferredSize: const Size.fromHeight(0.0))),
-                      child: AppBar(
-                        backgroundColor: Colors.white,
-                      ),
-                      preferredSize: Size.fromHeight(0.0))),
-            },
-            debugShowCheckedModeBanner: false,
+        Navigator.push(context, MaterialPageRoute(builder: (context) {
+          return RoadSignDetailPage(
+            test_title: ROADSIGN_LIST[index]['name'],
+            question_num: ROADSIGN_LIST[index]['question_num'],
+            qualifying_num: ROADSIGN_LIST[index]['qualifying_num'],
+            percent: '60%',
+            select_test_url: road_sign_url,
           );
         }));
       },

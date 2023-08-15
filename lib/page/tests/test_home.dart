@@ -12,6 +12,8 @@ import '../../ad_helper.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:app/page/tests/test_list.dart';
 import 'package:app/page/tests/roadsign_list.dart';
+import 'package:app/page/tests/test_detail.dart';
+import 'package:app/page/tests/roadsign_detail.dart';
 
 class TestHomePage extends StatefulWidget {
   final String stateAbbr;
@@ -51,7 +53,6 @@ class _TestHomePageState extends State<TestHomePage>
 
   NativeAd? _ad;
   int _adError = 0;
-  bool _nativeAdIsLoaded = false;
 
   Future getTestList() async {
     String url = 'https://api-dmv.silversiri.com/getTestsList';
@@ -370,19 +371,13 @@ class _TestDataListState extends State<TestDataList> {
                 TEST_LIST[index]['slug'] +
                 '/';
           }
-          Navigator.pushReplacement(context,
-              MaterialPageRoute(builder: (context) {
-            return MaterialApp(
-              routes: {
-                "/": (_) => WebviewScaffold(
-                    url: select_test_url,
-                    appBar: PreferredSize(
-                        child: AppBar(
-                          backgroundColor: Colors.white,
-                        ),
-                        preferredSize: Size.fromHeight(0.0))),
-              },
-              debugShowCheckedModeBanner: false,
+          Navigator.push(context, MaterialPageRoute(builder: (context) {
+            return TestDetailPage(
+              test_title: TEST_LIST[index]['name'],
+              question_num: TEST_LIST[index]['question_num'],
+              qualifying_num: TEST_LIST[index]['qualifying_num'],
+              percent: TEST_LIST[index]['score_passing'] + '%',
+              select_test_url: select_test_url,
             );
           }));
         },
@@ -450,20 +445,13 @@ class _RoadSignListState extends State<RoadSignList> {
         onTap: () {
           String road_sign_url =
               'https://www.dmv-test-pro.com/road-sign-test/${ROADSIGN_LIST[index]['slug']}';
-          Navigator.pushReplacement(context,
-              MaterialPageRoute(builder: (context) {
-            return MaterialApp(
-              routes: {
-                "/": (_) => WebviewScaffold(
-                    url: road_sign_url,
-                    appBar: PreferredSize(
-                        // child: AppBar(), preferredSize: const Size.fromHeight(0.0))),
-                        child: AppBar(
-                          backgroundColor: Colors.white,
-                        ),
-                        preferredSize: Size.fromHeight(0.0))),
-              },
-              debugShowCheckedModeBanner: false,
+          Navigator.push(context, MaterialPageRoute(builder: (context) {
+            return RoadSignDetailPage(
+              test_title: ROADSIGN_LIST[index]['name'],
+              question_num: ROADSIGN_LIST[index]['question_num'],
+              qualifying_num: ROADSIGN_LIST[index]['qualifying_num'],
+              percent: '60%',
+              select_test_url: road_sign_url,
             );
           }));
         },

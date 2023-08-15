@@ -8,13 +8,13 @@ import 'package:flutter_webview_plugin/flutter_webview_plugin.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
-class TestDetailPage extends StatefulWidget {
+class RoadSignDetailPage extends StatefulWidget {
   final String test_title;
   final int question_num;
   final int qualifying_num;
   final String percent;
   final String select_test_url;
-  const TestDetailPage({
+  const RoadSignDetailPage({
     Key? key,
     required this.test_title,
     required this.question_num,
@@ -24,10 +24,10 @@ class TestDetailPage extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  _TestDetailPageState createState() => _TestDetailPageState();
+  _RoadSignDetailPageState createState() => _RoadSignDetailPageState();
 }
 
-class _TestDetailPageState extends State<TestDetailPage> {
+class _RoadSignDetailPageState extends State<RoadSignDetailPage> {
   NativeAd? _ad;
   int _adError = 0;
 

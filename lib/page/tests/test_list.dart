@@ -12,6 +12,7 @@ import '../../ad_helper.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 import 'package:app/page/tests/test_home.dart';
+import 'package:app/page/tests/test_detail.dart';
 
 class TestListPage extends StatefulWidget {
   final String stateAbbr;
@@ -44,6 +45,9 @@ class _TestListPageState extends State<TestListPage> {
 
   int _getTestListStatus = -1;
 
+  NativeAd? _ad;
+  int _adError = 0;
+
   Future getTestList() async {
     String url = 'https://api-dmv.silversiri.com/getTestsList';
     var res = await http.post(
@@ -71,6 +75,34 @@ class _TestListPageState extends State<TestListPage> {
     licenceIndex = widget.licenceIndex;
     licenceLower = widget.licenceLower;
     getTestList();
+
+    NativeAd(
+      adUnitId: AdHelper.nativeAdUnitId,
+      factoryId: 'listTile',
+      request: AdRequest(),
+      listener: NativeAdListener(
+        onAdLoaded: (ad) {
+          setState(() {
+            _ad = ad as NativeAd;
+          });
+        },
+        onAdFailedToLoad: (ad, error) {
+          // Releases an ad resource when it fails to load
+          ad.dispose();
+          setState(() {
+            _adError = error.code;
+          });
+          debugPrint(
+              'Ad load failed (code=${error.code} message=${error.message})');
+        },
+      ),
+    ).load();
+  }
+
+  @override
+  void dispose() {
+    _ad?.dispose();
+    super.dispose();
   }
 
   @override
@@ -236,19 +268,14 @@ class _TestDataListState extends State<TestDataList> {
               TEST_LIST[index]['slug'] +
               '/';
         }
-        Navigator.pushReplacement(context,
-            MaterialPageRoute(builder: (context) {
-          return MaterialApp(
-            routes: {
-              "/": (_) => WebviewScaffold(
-                  url: select_test_url,
-                  appBar: PreferredSize(
-                      child: AppBar(
-                        backgroundColor: Colors.white,
-                      ),
-                      preferredSize: Size.fromHeight(0.0))),
-            },
-            debugShowCheckedModeBanner: false,
+
+        Navigator.push(context, MaterialPageRoute(builder: (context) {
+          return TestDetailPage(
+            test_title: TEST_LIST[index]['name'],
+            question_num: TEST_LIST[index]['question_num'],
+            qualifying_num: TEST_LIST[index]['qualifying_num'],
+            percent: TEST_LIST[index]['score_passing'] + '%',
+            select_test_url: select_test_url,
           );
         }));
       },
