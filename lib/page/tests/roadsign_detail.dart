@@ -8,8 +8,17 @@ import 'package:firebase_analytics/firebase_analytics.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:app/page/tab_navigator.dart';
 
 class RoadSignDetailPage extends StatefulWidget {
+  final int stateIndex;
+  final String stateAbbr;
+  final String stateValue;
+  final String stateSlug;
+  final int licenceIndex;
+  final String licence;
+  final String licenceLower;
+
   final String test_title;
   final int question_num;
   final int qualifying_num;
@@ -17,6 +26,13 @@ class RoadSignDetailPage extends StatefulWidget {
   final String select_test_url;
   const RoadSignDetailPage({
     Key? key,
+    required this.stateIndex,
+    required this.stateAbbr,
+    required this.stateValue,
+    required this.stateSlug,
+    required this.licenceIndex,
+    required this.licence,
+    required this.licenceLower,
     required this.test_title,
     required this.question_num,
     required this.qualifying_num,
@@ -32,6 +48,13 @@ class _RoadSignDetailPageState extends State<RoadSignDetailPage> {
   NativeAd? _ad;
   int _adError = 0;
 
+  int stateIndex = -1;
+  String stateAbbr = '';
+  String stateValue = '';
+  String stateSlug = '';
+  int licenceIndex = -1;
+  String licence = '';
+  String licenceLower = '';
   String test_title = '';
   int question_num = -1;
   int qualifying_num = -1;
@@ -40,6 +63,13 @@ class _RoadSignDetailPageState extends State<RoadSignDetailPage> {
 
   @override
   void initState() {
+    stateIndex = widget.stateIndex;
+    stateAbbr = widget.stateAbbr;
+    stateValue = widget.stateValue;
+    stateSlug = widget.stateSlug;
+    licenceIndex = widget.licenceIndex;
+    licence = widget.licence;
+    licenceLower = widget.licenceLower;
     test_title = widget.test_title;
     question_num = widget.question_num;
     qualifying_num = widget.qualifying_num;
@@ -107,6 +137,7 @@ class _RoadSignDetailPageState extends State<RoadSignDetailPage> {
                           margin: EdgeInsets.only(top: statusBar),
                           child: WebView(
                             initialUrl: select_test_url,
+                            javascriptMode: JavascriptMode.unrestricted,
                           ),
                         ),
                       );
@@ -212,7 +243,20 @@ class _RoadSignDetailPageState extends State<RoadSignDetailPage> {
                           )),
                     ),
                     InkWell(
-                      onTap: () {},
+                      onTap: () {
+                        Navigator.push(context,
+                            MaterialPageRoute(builder: (context) {
+                          return TabNavigator(
+                            stateIndex: stateIndex,
+                            stateAbbr: stateAbbr,
+                            stateValue: stateValue,
+                            stateSlug: stateSlug,
+                            licenceIndex: licenceIndex,
+                            licence: licence,
+                            licenceLower: licenceLower,
+                          );
+                        }));
+                      },
                       child: SvgPicture.asset(
                         'images/tests.svg',
                         width: 20,

@@ -29,14 +29,25 @@ String stateValue = '';
 String stateSlug = '';
 
 class _StateListPageState extends State<StateListPage> {
-  bool isInProduction = bool.fromEnvironment("dart.vm.product");
-
   bool backVisible = false;
   int _getStateListStatus = -1;
 
+  bool isInProduction = bool.fromEnvironment("dart.vm.product");
+  String Path = '';
+
   Future getStateList() async {
-    // print(isInProduction);
-    String url = 'https://api-dmv.silversiri.com/getStateList';
+    print('---------------------');
+    print(isInProduction);
+    setState(() {
+      if (isInProduction) {
+        Path = 'https://api.dmv-test-pro.com/';
+      } else {
+        Path = 'https://api-dmv.silversiri.com/';
+      }
+    });
+    print(Path);
+    print('${Path}getStateList');
+    String url = '${Path}getStateList';
     var res = await http.post(Uri.parse(url));
     if (res.statusCode == 200) {
       var body = json.decode(res.body);

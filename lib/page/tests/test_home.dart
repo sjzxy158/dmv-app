@@ -16,18 +16,24 @@ import 'package:app/page/tests/test_detail.dart';
 import 'package:app/page/tests/roadsign_detail.dart';
 
 class TestHomePage extends StatefulWidget {
+  final int stateIndex;
   final String stateAbbr;
+  final String stateValue;
   final String stateSlug;
   final int licenceIndex;
+  final String licence;
   final String licenceLower;
 
-  const TestHomePage({
-    Key? key,
-    required this.stateAbbr,
-    required this.stateSlug,
-    required this.licenceIndex,
-    required this.licenceLower,
-  }) : super(key: key);
+  const TestHomePage(
+      {Key? key,
+      required this.stateIndex,
+      required this.stateAbbr,
+      required this.stateValue,
+      required this.stateSlug,
+      required this.licenceIndex,
+      required this.licence,
+      required this.licenceLower})
+      : super(key: key);
 
   @override
   _TestHomePageState createState() => _TestHomePageState();
@@ -41,9 +47,12 @@ String select_test_url = '';
 
 class _TestHomePageState extends State<TestHomePage>
     with AutomaticKeepAliveClientMixin {
+  int stateIndex = -1;
   String stateAbbr = '';
+  String stateValue = '';
   String stateSlug = '';
   int licenceIndex = -1;
+  String licence = '';
   String licenceLower = '';
   int testListLength = 0;
 
@@ -54,8 +63,18 @@ class _TestHomePageState extends State<TestHomePage>
   NativeAd? _ad;
   int _adError = 0;
 
+  bool isInProduction = bool.fromEnvironment("dart.vm.product");
+  String Path = '';
+
   Future getTestList() async {
-    String url = 'https://api-dmv.silversiri.com/getTestsList';
+    setState(() {
+      if (isInProduction) {
+        Path = 'https://api.dmv-test-pro.com/';
+      } else {
+        Path = 'https://api-dmv.silversiri.com/';
+      }
+    });
+    String url = '${Path}getTestsList';
     var res = await http.post(
       Uri.parse(url),
       body: {'type': licenceLower, 'state': stateSlug},
@@ -76,7 +95,14 @@ class _TestHomePageState extends State<TestHomePage>
   }
 
   Future getRoadSignList() async {
-    String url = 'https://api-dmv.silversiri.com/getRoadList';
+    setState(() {
+      if (isInProduction) {
+        Path = 'https://api.dmv-test-pro.com/';
+      } else {
+        Path = 'https://api-dmv.silversiri.com/';
+      }
+    });
+    String url = '${Path}getRoadList';
     var res = await http.post(Uri.parse(url));
     if (res.statusCode == 200) {
       var body = json.decode(res.body);
@@ -95,9 +121,12 @@ class _TestHomePageState extends State<TestHomePage>
 
   @override
   void initState() {
+    stateIndex = widget.stateIndex;
     stateAbbr = widget.stateAbbr;
+    stateValue = widget.stateValue;
     stateSlug = widget.stateSlug;
     licenceIndex = widget.licenceIndex;
+    licence = widget.licence;
     licenceLower = widget.licenceLower;
     getTestList();
     getRoadSignList();
@@ -213,9 +242,12 @@ class _TestHomePageState extends State<TestHomePage>
                                                 MaterialPageRoute(
                                                     builder: (context) {
                                               return TestListPage(
+                                                stateIndex: stateIndex,
                                                 stateAbbr: stateAbbr,
+                                                stateValue: stateValue,
                                                 stateSlug: stateSlug,
                                                 licenceIndex: licenceIndex,
+                                                licence: licence,
                                                 licenceLower: licenceLower,
                                               );
                                             }));
@@ -275,9 +307,12 @@ class _TestHomePageState extends State<TestHomePage>
                                                 MaterialPageRoute(
                                                     builder: (context) {
                                               return RoadSignListPage(
+                                                stateIndex: stateIndex,
                                                 stateAbbr: stateAbbr,
+                                                stateValue: stateValue,
                                                 stateSlug: stateSlug,
                                                 licenceIndex: licenceIndex,
+                                                licence: licence,
                                                 licenceLower: licenceLower,
                                               );
                                             }));
@@ -381,6 +416,13 @@ class _TestDataListState extends State<TestDataList> {
           }
           Navigator.push(context, MaterialPageRoute(builder: (context) {
             return TestDetailPage(
+              stateIndex: stateIndex,
+              stateAbbr: stateAbbr,
+              stateValue: stateValue,
+              stateSlug: stateSlug,
+              licenceIndex: licenceIndex,
+              licence: licence,
+              licenceLower: licenceLower,
               test_title: TEST_LIST[index]['name'],
               question_num: TEST_LIST[index]['question_num'],
               qualifying_num: TEST_LIST[index]['qualifying_num'],
@@ -455,6 +497,13 @@ class _RoadSignListState extends State<RoadSignList> {
               'https://www.dmv-test-pro.com/road-sign-test/${ROADSIGN_LIST[index]['slug']}';
           Navigator.push(context, MaterialPageRoute(builder: (context) {
             return RoadSignDetailPage(
+              stateIndex: stateIndex,
+              stateAbbr: stateAbbr,
+              stateValue: stateValue,
+              stateSlug: stateSlug,
+              licenceIndex: licenceIndex,
+              licence: licence,
+              licenceLower: licenceLower,
               test_title: ROADSIGN_LIST[index]['name'],
               question_num: ROADSIGN_LIST[index]['question_num'],
               qualifying_num: ROADSIGN_LIST[index]['qualifying_num'],

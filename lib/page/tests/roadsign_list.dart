@@ -11,21 +11,27 @@ import 'package:firebase_analytics/firebase_analytics.dart';
 import '../../ad_helper.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 
-import 'package:app/page/tests/test_home.dart';
+import 'package:app/page/tab_navigator.dart';
 import 'package:app/page/tests/roadsign_detail.dart';
 
 class RoadSignListPage extends StatefulWidget {
+  final int stateIndex;
   final String stateAbbr;
+  final String stateValue;
   final String stateSlug;
   final int licenceIndex;
+  final String licence;
   final String licenceLower;
-  const RoadSignListPage({
-    Key? key,
-    required this.stateAbbr,
-    required this.stateSlug,
-    required this.licenceIndex,
-    required this.licenceLower,
-  }) : super(key: key);
+  const RoadSignListPage(
+      {Key? key,
+      required this.stateIndex,
+      required this.stateAbbr,
+      required this.stateValue,
+      required this.stateSlug,
+      required this.licenceIndex,
+      required this.licence,
+      required this.licenceLower})
+      : super(key: key);
 
   @override
   _RoadSignListPageState createState() => _RoadSignListPageState();
@@ -34,17 +40,30 @@ class RoadSignListPage extends StatefulWidget {
 List ROADSIGN_LIST = [];
 String select_test_url = '';
 
-class _RoadSignListPageState extends State<RoadSignListPage> {
-  String stateAbbr = '';
-  String stateSlug = '';
-  int licenceIndex = -1;
-  String licenceLower = '';
+int stateIndex2 = -1;
+String stateAbbr2 = '';
+String stateValue2 = '';
+String stateSlug2 = '';
+int licenceIndex2 = -1;
+String licence2 = '';
+String licenceLower2 = '';
 
+class _RoadSignListPageState extends State<RoadSignListPage> {
   int testListLength = 0;
   int _getRognSignListStatus = -1;
 
+  bool isInProduction = bool.fromEnvironment("dart.vm.product");
+  String Path = '';
+
   Future getRoadSignList() async {
-    String url = 'https://api-dmv.silversiri.com/getRoadList';
+    setState(() {
+      if (isInProduction) {
+        Path = 'https://api.dmv-test-pro.com/';
+      } else {
+        Path = 'https://api-dmv.silversiri.com/';
+      }
+    });
+    String url = '${Path}getRoadList';
     var res = await http.post(
       Uri.parse(url),
     );
@@ -63,10 +82,13 @@ class _RoadSignListPageState extends State<RoadSignListPage> {
   }
 
   void initState() {
-    stateAbbr = widget.stateAbbr;
-    stateSlug = widget.stateSlug;
-    licenceIndex = widget.licenceIndex;
-    licenceLower = widget.licenceLower;
+    stateIndex2 = widget.stateIndex;
+    stateAbbr2 = widget.stateAbbr;
+    stateValue2 = widget.stateValue;
+    stateSlug2 = widget.stateSlug;
+    licenceIndex2 = widget.licenceIndex;
+    licence2 = widget.licence;
+    licenceLower2 = widget.licenceLower;
     getRoadSignList();
     // _testSetCurrentScreen();
   }
@@ -156,11 +178,14 @@ class _RoadSignListPageState extends State<RoadSignListPage> {
                       onTap: () {
                         Navigator.push(context,
                             MaterialPageRoute(builder: (context) {
-                          return TestHomePage(
-                            stateAbbr: stateAbbr,
-                            stateSlug: stateSlug,
-                            licenceIndex: licenceIndex,
-                            licenceLower: licenceLower,
+                          return TabNavigator(
+                            stateIndex: stateIndex2,
+                            stateAbbr: stateAbbr2,
+                            stateValue: stateValue2,
+                            stateSlug: stateSlug2,
+                            licenceIndex: licenceIndex2,
+                            licence: licence2,
+                            licenceLower: licenceLower2,
                           );
                         }));
                       },
@@ -212,6 +237,13 @@ class _RoadSignListState extends State<RoadSignList> {
             'https://www.dmv-test-pro.com/road-sign-test/${ROADSIGN_LIST[index]['slug']}';
         Navigator.push(context, MaterialPageRoute(builder: (context) {
           return RoadSignDetailPage(
+            stateIndex: stateIndex2,
+            stateAbbr: stateAbbr2,
+            stateValue: stateValue2,
+            stateSlug: stateSlug2,
+            licenceIndex: licenceIndex2,
+            licence: licence2,
+            licenceLower: licenceLower2,
             test_title: ROADSIGN_LIST[index]['name'],
             question_num: ROADSIGN_LIST[index]['question_num'],
             qualifying_num: ROADSIGN_LIST[index]['qualifying_num'],

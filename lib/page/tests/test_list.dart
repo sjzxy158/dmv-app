@@ -11,22 +11,28 @@ import 'package:firebase_analytics/firebase_analytics.dart';
 import '../../ad_helper.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 
-import 'package:app/page/tests/test_home.dart';
+import 'package:app/page/tab_navigator.dart';
 import 'package:app/page/tests/test_detail.dart';
 
 class TestListPage extends StatefulWidget {
+  final int stateIndex;
   final String stateAbbr;
+  final String stateValue;
   final String stateSlug;
   final int licenceIndex;
+  final String licence;
   final String licenceLower;
 
-  const TestListPage({
-    Key? key,
-    required this.stateAbbr,
-    required this.stateSlug,
-    required this.licenceIndex,
-    required this.licenceLower,
-  }) : super(key: key);
+  const TestListPage(
+      {Key? key,
+      required this.stateIndex,
+      required this.stateAbbr,
+      required this.stateValue,
+      required this.stateSlug,
+      required this.licenceIndex,
+      required this.licence,
+      required this.licenceLower})
+      : super(key: key);
 
   @override
   _TestListPageState createState() => _TestListPageState();
@@ -36,11 +42,15 @@ List TEST_LIST = [];
 int cur_type_index = -1;
 String select_test_url = '';
 
+int stateIndex = -1;
+String stateAbbr = '';
+String stateValue = '';
+String stateSlug = '';
+int licenceIndex = -1;
+String licence = '';
+String licenceLower = '';
+
 class _TestListPageState extends State<TestListPage> {
-  String stateAbbr = '';
-  String stateSlug = '';
-  int licenceIndex = -1;
-  String licenceLower = '';
   int testListLength = 0;
 
   int _getTestListStatus = -1;
@@ -48,8 +58,18 @@ class _TestListPageState extends State<TestListPage> {
   NativeAd? _ad;
   int _adError = 0;
 
+  bool isInProduction = bool.fromEnvironment("dart.vm.product");
+  String Path = '';
+
   Future getTestList() async {
-    String url = 'https://api-dmv.silversiri.com/getTestsList';
+    setState(() {
+      if (isInProduction) {
+        Path = 'https://api.dmv-test-pro.com/';
+      } else {
+        Path = 'https://api-dmv.silversiri.com/';
+      }
+    });
+    String url = '${Path}getTestsList';
     var res = await http.post(
       Uri.parse(url),
       body: {'type': licenceLower, 'state': stateSlug},
@@ -70,9 +90,12 @@ class _TestListPageState extends State<TestListPage> {
   }
 
   void initState() {
+    stateIndex = widget.stateIndex;
     stateAbbr = widget.stateAbbr;
+    stateValue = widget.stateValue;
     stateSlug = widget.stateSlug;
     licenceIndex = widget.licenceIndex;
+    licence = widget.licence;
     licenceLower = widget.licenceLower;
     getTestList();
 
@@ -194,10 +217,13 @@ class _TestListPageState extends State<TestListPage> {
                       onTap: () {
                         Navigator.push(context,
                             MaterialPageRoute(builder: (context) {
-                          return TestHomePage(
+                          return TabNavigator(
+                            stateIndex: stateIndex,
                             stateAbbr: stateAbbr,
+                            stateValue: stateValue,
                             stateSlug: stateSlug,
                             licenceIndex: licenceIndex,
+                            licence: licence,
                             licenceLower: licenceLower,
                           );
                         }));
@@ -279,6 +305,13 @@ class _TestDataListState extends State<TestDataList> {
 
         Navigator.push(context, MaterialPageRoute(builder: (context) {
           return TestDetailPage(
+            stateIndex: stateIndex,
+            stateAbbr: stateAbbr,
+            stateValue: stateValue,
+            stateSlug: stateSlug,
+            licenceIndex: licenceIndex,
+            licence: licence,
+            licenceLower: licenceLower,
             test_title: TEST_LIST[index]['name'],
             question_num: TEST_LIST[index]['question_num'],
             qualifying_num: TEST_LIST[index]['qualifying_num'],

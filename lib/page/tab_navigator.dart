@@ -78,9 +78,12 @@ class _TabNavigatorState extends State<TabNavigator> {
           physics: const NeverScrollableScrollPhysics(),
           children: <Widget>[
             TestHomePage(
+              stateIndex: stateIndex,
               stateAbbr: stateAbbr,
+              stateValue: stateValue,
               stateSlug: stateSlug,
               licenceIndex: licenceIndex,
+              licence: licence,
               licenceLower: licenceLower,
             ),
             HandbookPage(),
