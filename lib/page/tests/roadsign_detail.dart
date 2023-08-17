@@ -76,6 +76,14 @@ class _RoadSignDetailPageState extends State<RoadSignDetailPage> {
     percent = widget.percent;
     select_test_url = widget.select_test_url;
 
+    // print(stateIndex);
+    // print(stateAbbr);
+    // print(stateValue);
+    // print(stateSlug);
+    // print(licenceIndex);
+    // print(licence);
+    // print(licenceLower);
+
     NativeAd(
       adUnitId: AdHelper.nativeAdUnitId,
       factoryId: 'fullTile',

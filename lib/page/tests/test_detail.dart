@@ -75,6 +75,13 @@ class _TestDetailPageState extends State<TestDetailPage> {
     qualifying_num = widget.qualifying_num;
     percent = widget.percent;
     select_test_url = widget.select_test_url;
+    // print(stateIndex);
+    // print(stateAbbr);
+    // print(stateValue);
+    // print(stateSlug);
+    // print(licenceIndex);
+    // print(licence);
+    // print(licenceLower);
 
     if (Platform.isAndroid) WebView.platform = AndroidWebView();
 

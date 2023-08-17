@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:app/page/tests/test_home.dart';
 import 'package:app/page/setting.dart';
@@ -60,6 +61,7 @@ class _TabNavigatorState extends State<TabNavigator> {
     licenceIndex = widget.licenceIndex;
     licence = widget.licence;
     licenceLower = widget.licenceLower;
+    _getStateAndTypeSelectStatus();
     _testSetCurrentScreen();
   }
 
@@ -86,7 +88,11 @@ class _TabNavigatorState extends State<TabNavigator> {
               licence: licence,
               licenceLower: licenceLower,
             ),
-            HandbookPage(),
+            HandbookPage(
+              stateAbbr: stateAbbr,
+              stateSlug: stateSlug,
+              licenceLower: licenceLower,
+            ),
             SettingPage(),
           ],
         ),
@@ -144,5 +150,18 @@ class _TabNavigatorState extends State<TabNavigator> {
           )),
       label: title,
     );
+  }
+
+  _getStateAndTypeSelectStatus() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
+      stateIndex = prefs.getInt('stateSelectIndex');
+      stateAbbr = prefs.getString('stateSelectAbbr');
+      stateValue = prefs.getString('stateSelectValue');
+      stateSlug = prefs.getString('stateSelectSlug');
+      licenceIndex = prefs.getInt('typeSelectLicenceIndex');
+      licence = prefs.getString('typeSelectLicence');
+      licenceLower = prefs.getString('typeSelectLicenceLowerr');
+    });
   }
 }

@@ -1,5 +1,9 @@
 import 'dart:convert';
 
+import 'package:dio/dio.dart';
+import 'package:http/http.dart' as http;
+import 'package:dio/dio.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
@@ -89,8 +93,8 @@ class MyAppContentState extends State<MyAppContent> {
     });
 
     _testSetCurrentScreen();
-    _requestNotificationPermission();
-    // _getUsetSubscribeInfo();
+    // _requestNotificationPermission();
+    _getUsetSubscribeInfo();
   }
 
   // 屏幕访问
@@ -116,8 +120,6 @@ class MyAppContentState extends State<MyAppContent> {
 
   // 获取用户 id
   Future<void> _getUsetSubscribeInfo() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String uid = prefs.getString('uid') ?? '';
     // 本地信息
     Locale locale = WidgetsBinding.instance!.platformDispatcher.locale;
 
@@ -125,7 +127,7 @@ class MyAppContentState extends State<MyAppContent> {
     final languageCode = locale.languageCode;
     final countryCode = locale.countryCode;
     PackageInfo packageInfo = await PackageInfo.fromPlatform();
-
+    String version = packageInfo.version;
     DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
     AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
     DateTime now = DateTime.now();
@@ -133,24 +135,40 @@ class MyAppContentState extends State<MyAppContent> {
     String timeZoneOffsetString = formatTimeZoneOffset(timeZoneOffset);
 
     print('------------------');
-    print(fcmToken);
-    print(languageCode);
-    print(countryCode);
-    print(packageInfo.version);
-    print(androidInfo);
-    print(androidInfo.brand);
-    print(androidInfo.model);
-    print(androidInfo.manufacturer);
-    print(androidInfo.device);
-    print(androidInfo.version.release);
-    print(androidInfo.isPhysicalDevice);
-    print(timeZoneOffsetString);
+    // print(fcmToken);
+    // print(languageCode);
+    // print(countryCode);
+    // print(packageInfo.version);
+    // print(androidInfo);
+    // print(androidInfo.brand);
+    // print(androidInfo.model);
+    // print(androidInfo.manufacturer);
+    // print(androidInfo.device);
+    // print(androidInfo.version.release);
+    // print(androidInfo.isPhysicalDevice);
+    // print(timeZoneOffsetString);
+    String phoneInfo =
+        '${androidInfo.brand},${androidInfo.model},${androidInfo.manufacturer},${androidInfo.device},${androidInfo.version.release}';
 
-    // if (uid == '') {
-    //   String result = await sendSubscribe(fcmToken, languageCode, countryCode,
-    //       packageInfo.version, phoneInfo, timeZoneOffsetString);
-    //   await prefs.setString('uid', result);
-    // }
+    String url = 'https://push.silversiri.com/getAppSubscribe';
+    // var params = {
+    //   'app': 'tb',
+    //   'token': fcmToken,
+    //   'lang': languageCode,
+    //   'country': countryCode,
+    //   'version': packageInfo.version,
+    //   'phone_info': phoneInfo,
+    //   'time_zone': timeZoneOffsetString
+    // };
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String uid = prefs.getString('uid') ?? '';
+    if (uid == '') {
+      // if (uid == '') {
+      //   String result = await sendSubscribe(fcmToken, languageCode, countryCode,
+      //       packageInfo.version, phoneInfo, timeZoneOffsetString);
+      //   await prefs.setString('uid', result);
+      // }
+    }
   }
 
   // 展示推送
@@ -189,21 +207,6 @@ class MyAppContentState extends State<MyAppContent> {
           return const StartPage();
         },
       ),
-      // title: 'Welcome to DMV',
-      // theme: ThemeData(primarySwatch: Colors.green, primaryColor: Colors.white),
-      // routes: {
-      //   "/": (_) => WebviewScaffold(
-      //       // url: "https://www.menuwithnutrition.com/",
-      //       // url: "https://dmv.silversiri.com",
-      //       url: "https://www.dmv-test-pro.com",
-      //       appBar: PreferredSize(
-      //           // child: AppBar(), preferredSize: const Size.fromHeight(0.0))),
-      //           child: AppBar(
-      //             backgroundColor: Colors.white,
-      //           ),
-      //           preferredSize: Size.fromHeight(0.0))),
-      // },
-      // debugShowCheckedModeBanner: false,
     );
   }
 }

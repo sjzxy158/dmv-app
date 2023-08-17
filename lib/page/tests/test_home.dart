@@ -44,16 +44,16 @@ List ROADSIGN_LIST = [];
 
 int cur_type_index = -1;
 String select_test_url = '';
+int stateIndex = -1;
+String stateAbbr = '';
+String stateValue = '';
+String stateSlug = '';
+int licenceIndex = -1;
+String licence = '';
+String licenceLower = '';
 
 class _TestHomePageState extends State<TestHomePage>
     with AutomaticKeepAliveClientMixin {
-  int stateIndex = -1;
-  String stateAbbr = '';
-  String stateValue = '';
-  String stateSlug = '';
-  int licenceIndex = -1;
-  String licence = '';
-  String licenceLower = '';
   int testListLength = 0;
 
   int _getTestListStatus = -1;
