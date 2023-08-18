@@ -90,7 +90,9 @@ class _TabNavigatorState extends State<TabNavigator> {
             ),
             HandbookPage(
               stateAbbr: stateAbbr,
+              stateValue: stateValue,
               stateSlug: stateSlug,
+              licence: licence,
               licenceLower: licenceLower,
             ),
             SettingPage(),
@@ -161,7 +163,7 @@ class _TabNavigatorState extends State<TabNavigator> {
       stateSlug = prefs.getString('stateSelectSlug');
       licenceIndex = prefs.getInt('typeSelectLicenceIndex');
       licence = prefs.getString('typeSelectLicence');
-      licenceLower = prefs.getString('typeSelectLicenceLowerr');
+      licenceLower = prefs.getString('typeSelectLicenceLower');
     });
   }
 }

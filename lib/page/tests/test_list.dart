@@ -120,7 +120,7 @@ class _TestListPageState extends State<TestListPage> {
         },
       ),
     ).load();
-    // _testSetCurrentScreen();
+    _testSetCurrentScreen();
   }
 
   @override
@@ -131,8 +131,8 @@ class _TestListPageState extends State<TestListPage> {
 
   Future<void> _testSetCurrentScreen() async {
     await FirebaseAnalytics.instance.setCurrentScreen(
-      screenName: 'Test List',
-      screenClassOverride: 'Test List',
+      screenName: '${stateValue} ${licence} Tests List',
+      screenClassOverride: '${stateValue} ${licence} Tests List',
     );
   }
 
@@ -312,11 +312,14 @@ class _TestDataListState extends State<TestDataList> {
             licenceIndex: licenceIndex,
             licence: licence,
             licenceLower: licenceLower,
+            test_index: index + 1,
             test_title: TEST_LIST[index]['name'],
             question_num: TEST_LIST[index]['question_num'],
             qualifying_num: TEST_LIST[index]['qualifying_num'],
             percent: TEST_LIST[index]['score_passing'] + '%',
             select_test_url: select_test_url,
+            select_test_image_url:
+                "images/pic/$licenceLower/$licenceLower-${index + 1}.png",
           );
         }));
       },
@@ -326,13 +329,14 @@ class _TestDataListState extends State<TestDataList> {
           AspectRatio(
             aspectRatio: 1,
             child: Container(
-              // height: 120,
-              // width: 210,
-              decoration: BoxDecoration(
-                color: Colors.grey,
-                borderRadius: BorderRadius.circular(8),
-              ),
-            ),
+                // height: 120,
+                // width: 210,
+                child: ClipRRect(
+              borderRadius: BorderRadius.circular(8),
+              child: Image(
+                  image: AssetImage(
+                      "images/pic/$licenceLower/$licenceLower-${index + 1}.png")),
+            )),
           ),
           Container(
             margin: EdgeInsets.only(top: 10),

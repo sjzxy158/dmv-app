@@ -8,6 +8,7 @@ import 'package:app/page/type.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
 
 class StateListPage extends StatefulWidget {
   final bool backVisible;
@@ -69,6 +70,14 @@ class _StateListPageState extends State<StateListPage> {
       backVisible = widget.backVisible;
     });
     getStateList();
+    _testSetCurrentScreen();
+  }
+
+  Future<void> _testSetCurrentScreen() async {
+    await FirebaseAnalytics.instance.setCurrentScreen(
+      screenName: 'Choose State',
+      screenClassOverride: 'Choose State',
+    );
   }
 
   @override

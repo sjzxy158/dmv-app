@@ -5,6 +5,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:app/page/tab_navigator.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
 
 class TypeSelectPage extends StatefulWidget {
   final int stateIndex;
@@ -40,7 +41,14 @@ class _TypeSelectPageState extends State<TypeSelectPage> {
     stateAbbr = widget.stateAbbr;
     stateValue = widget.stateValue;
     stateSlug = widget.stateSlug;
-    print(stateIndex);
+    _testSetCurrentScreen();
+  }
+
+  Future<void> _testSetCurrentScreen() async {
+    await FirebaseAnalytics.instance.setCurrentScreen(
+      screenName: 'Choose Type',
+      screenClassOverride: 'Choose Type',
+    );
   }
 
   @override
@@ -144,7 +152,7 @@ class _TypeSelectPageState extends State<TypeSelectPage> {
     await prefs.setInt('typeSelectStatus', 1);
     await prefs.setInt('typeSelectLicenceIndex', licenceIndex);
     await prefs.setString('typeSelectLicence', licence);
-    await prefs.setString('typeSelectLicenceLowerr', licenceLower);
+    await prefs.setString('typeSelectLicenceLower', licenceLower);
   }
 
   _typeItem(String type, int index, int quesNum) {

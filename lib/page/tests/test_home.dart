@@ -9,6 +9,7 @@ import 'package:http/http.dart' as http;
 import 'package:firebase_analytics/firebase_analytics.dart';
 
 import '../../ad_helper.dart';
+import '../../http/api.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:app/page/tests/test_list.dart';
 import 'package:app/page/tests/roadsign_list.dart';
@@ -64,30 +65,28 @@ class _TestHomePageState extends State<TestHomePage>
   int _adError = 0;
 
   bool isInProduction = bool.fromEnvironment("dart.vm.product");
-  String Path = '';
+  String testPath = '';
+  String roadPath = '';
 
   Future getTestList() async {
     setState(() {
       if (isInProduction) {
-        Path = 'https://api.dmv-test-pro.com/';
+        testPath = productionApi.getTestsList;
       } else {
-        Path = 'https://api-dmv.silversiri.com/';
+        testPath = silversiriApi.getTestsList;
       }
     });
-    String url = '${Path}getTestsList';
     var res = await http.post(
-      Uri.parse(url),
+      Uri.parse(testPath),
       body: {'type': licenceLower, 'state': stateSlug},
     );
     if (res.statusCode == 200) {
       var body = json.decode(res.body);
-      // print(body['data']);
       setState(() {
         TEST_LIST = body['data'];
         testListLength = TEST_LIST.length;
         _getTestListStatus = res.statusCode;
       });
-      // _setListStatus(TEST_LIST);
       return body;
     } else {
       return null;
@@ -97,13 +96,12 @@ class _TestHomePageState extends State<TestHomePage>
   Future getRoadSignList() async {
     setState(() {
       if (isInProduction) {
-        Path = 'https://api.dmv-test-pro.com/';
+        roadPath = productionApi.getRoadList;
       } else {
-        Path = 'https://api-dmv.silversiri.com/';
+        roadPath = silversiriApi.getRoadList;
       }
     });
-    String url = '${Path}getRoadList';
-    var res = await http.post(Uri.parse(url));
+    var res = await http.post(Uri.parse(roadPath));
     if (res.statusCode == 200) {
       var body = json.decode(res.body);
       setState(() {
@@ -153,7 +151,6 @@ class _TestHomePageState extends State<TestHomePage>
           });
         },
         onAdFailedToLoad: (ad, error) {
-          // Releases an ad resource when it fails to load
           ad.dispose();
           setState(() {
             _adError = error.code;
@@ -163,7 +160,7 @@ class _TestHomePageState extends State<TestHomePage>
         },
       ),
     ).load();
-    // _testSetCurrentScreen();
+    _testSetCurrentScreen();
   }
 
   @override
@@ -174,8 +171,8 @@ class _TestHomePageState extends State<TestHomePage>
 
   Future<void> _testSetCurrentScreen() async {
     await FirebaseAnalytics.instance.setCurrentScreen(
-      screenName: 'Test Home',
-      screenClassOverride: 'Test Home',
+      screenName: '${stateValue} ${licence} Home',
+      screenClassOverride: '${stateValue} ${licence} Home',
     );
   }
 
@@ -423,11 +420,14 @@ class _TestDataListState extends State<TestDataList> {
               licenceIndex: licenceIndex,
               licence: licence,
               licenceLower: licenceLower,
+              test_index: index + 1,
               test_title: TEST_LIST[index]['name'],
               question_num: TEST_LIST[index]['question_num'],
               qualifying_num: TEST_LIST[index]['qualifying_num'],
               percent: TEST_LIST[index]['score_passing'] + '%',
               select_test_url: select_test_url,
+              select_test_image_url:
+                  "images/pic/$licenceLower/$licenceLower-${index + 1}.png",
             );
           }));
         },
@@ -441,13 +441,14 @@ class _TestDataListState extends State<TestDataList> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
                     Container(
-                      height: 160,
-                      width: 160,
-                      decoration: BoxDecoration(
-                        color: Colors.grey,
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                    ),
+                        height: 160,
+                        width: 160,
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(8),
+                          child: Image(
+                              image: AssetImage(
+                                  "images/pic/$licenceLower/$licenceLower-${index + 1}.png")),
+                        )),
                     Container(
                       margin: EdgeInsets.only(top: 10),
                       child: Text(

@@ -19,11 +19,13 @@ class TestDetailPage extends StatefulWidget {
   final String licence;
   final String licenceLower;
 
+  final int test_index;
   final String test_title;
   final int question_num;
   final int qualifying_num;
   final String percent;
   final String select_test_url;
+  final String select_test_image_url;
   const TestDetailPage({
     Key? key,
     required this.stateIndex,
@@ -33,11 +35,13 @@ class TestDetailPage extends StatefulWidget {
     required this.licenceIndex,
     required this.licence,
     required this.licenceLower,
+    required this.test_index,
     required this.test_title,
     required this.question_num,
     required this.qualifying_num,
     required this.percent,
     required this.select_test_url,
+    required this.select_test_image_url,
   }) : super(key: key);
 
   @override
@@ -55,11 +59,13 @@ class _TestDetailPageState extends State<TestDetailPage> {
   int licenceIndex = -1;
   String licence = '';
   String licenceLower = '';
+  int test_index = -1;
   String test_title = '';
   int question_num = -1;
   int qualifying_num = -1;
   String percent = '';
   String select_test_url = '';
+  String select_test_image_url = '';
 
   @override
   void initState() {
@@ -70,18 +76,13 @@ class _TestDetailPageState extends State<TestDetailPage> {
     licenceIndex = widget.licenceIndex;
     licence = widget.licence;
     licenceLower = widget.licenceLower;
+    test_index = widget.test_index;
     test_title = widget.test_title;
     question_num = widget.question_num;
     qualifying_num = widget.qualifying_num;
     percent = widget.percent;
     select_test_url = widget.select_test_url;
-    // print(stateIndex);
-    // print(stateAbbr);
-    // print(stateValue);
-    // print(stateSlug);
-    // print(licenceIndex);
-    // print(licence);
-    // print(licenceLower);
+    select_test_image_url = widget.select_test_image_url;
 
     if (Platform.isAndroid) WebView.platform = AndroidWebView();
 
@@ -106,7 +107,7 @@ class _TestDetailPageState extends State<TestDetailPage> {
         },
       ),
     ).load();
-    // _testSetCurrentScreen();
+    _testSetCurrentScreen();
   }
 
   @override
@@ -116,9 +117,15 @@ class _TestDetailPageState extends State<TestDetailPage> {
   }
 
   Future<void> _testSetCurrentScreen() async {
+    String current_title = '';
+    if (licenceIndex == 2) {
+      current_title = '$stateValue $licence $test_index';
+    } else {
+      current_title = '$stateValue $licence Test $test_index';
+    }
     await FirebaseAnalytics.instance.setCurrentScreen(
-      screenName: 'Test Detail',
-      screenClassOverride: 'Test Detail',
+      screenName: '$current_title',
+      screenClassOverride: '$current_title',
     );
   }
 
@@ -139,21 +146,6 @@ class _TestDetailPageState extends State<TestDetailPage> {
                 right: 0,
                 child: InkWell(
                   onTap: () {
-                    // Navigator.pushReplacement(context,
-                    //     MaterialPageRoute(builder: (context) {
-                    //   return MaterialApp(
-                    //     routes: {
-                    //       "/": (_) => WebviewScaffold(
-                    //           url: select_test_url,
-                    //           appBar: PreferredSize(
-                    //               child: AppBar(
-                    //                 backgroundColor: Colors.white,
-                    //               ),
-                    //               preferredSize: Size.fromHeight(0.0))),
-                    //     },
-                    //     debugShowCheckedModeBanner: false,
-                    //   );
-                    // }));
                     Navigator.pushReplacement(context,
                         MaterialPageRoute(builder: (context) {
                       return Scaffold(
@@ -210,8 +202,18 @@ class _TestDetailPageState extends State<TestDetailPage> {
                               height: 240,
                               margin: EdgeInsets.only(top: 16, bottom: 24),
                               decoration: BoxDecoration(
-                                  color: Colors.grey,
-                                  borderRadius: BorderRadius.circular(8)),
+                                color: Colors.grey,
+                                borderRadius: BorderRadius.circular(8),
+                                image: DecorationImage(
+                                  fit: BoxFit.fitWidth,
+                                  image: AssetImage(select_test_image_url),
+                                ),
+                              ),
+                              // child: ClipRRect(
+                              //   borderRadius: BorderRadius.circular(8),
+                              //   child: Image(
+                              //       image: AssetImage(select_test_image_url)),
+                              // )
                             ),
                             _infoItem(
                                 'questions',

@@ -27,7 +27,7 @@ class _SettingPageState extends State<SettingPage> {
   @override
   void initState() {
     _getStateAndTypeSelectStatus();
-    // _testSetCurrentScreen();
+    _testSetCurrentScreen();
   }
 
   Future<void> _testSetCurrentScreen() async {
@@ -195,7 +195,7 @@ class _SettingPageState extends State<SettingPage> {
       stateSlug = prefs.getString('stateSelectSlug');
       licenceIndex = prefs.getInt('typeSelectLicenceIndex');
       licence = prefs.getString('typeSelectLicence');
-      licenceLower = prefs.getString('typeSelectLicenceLowerr');
+      licenceLower = prefs.getString('typeSelectLicenceLower');
     });
   }
 }

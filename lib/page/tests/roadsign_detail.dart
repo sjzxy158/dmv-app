@@ -105,7 +105,7 @@ class _RoadSignDetailPageState extends State<RoadSignDetailPage> {
         },
       ),
     ).load();
-    // _testSetCurrentScreen();
+    _testSetCurrentScreen();
   }
 
   @override
@@ -116,8 +116,8 @@ class _RoadSignDetailPageState extends State<RoadSignDetailPage> {
 
   Future<void> _testSetCurrentScreen() async {
     await FirebaseAnalytics.instance.setCurrentScreen(
-      screenName: 'RoadSign Detail',
-      screenClassOverride: 'RoadSign Detail',
+      screenName: '$test_title',
+      screenClassOverride: '$test_title',
     );
   }
 

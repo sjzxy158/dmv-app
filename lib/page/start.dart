@@ -222,7 +222,7 @@ class _StartPage extends State<StartPage> {
       stateSlug = prefs.getString('stateSelectSlug');
       licenceIndex = prefs.getInt('typeSelectLicenceIndex');
       licence = prefs.getString('typeSelectLicence');
-      licenceLower = prefs.getString('typeSelectLicenceLowerr');
+      licenceLower = prefs.getString('typeSelectLicenceLower');
     });
   }
 }

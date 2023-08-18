@@ -21,6 +21,9 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 import 'page/start.dart';
 
+final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+    FlutterLocalNotificationsPlugin();
+
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   MobileAds.instance.initialize();
@@ -40,8 +43,29 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
 }
 
 //  后端接口，记录接受消息人数
-Future sendImpression(message) async {
+Future<void> sendImpression(RemoteMessage message) async {
+  String url = 'https://www.silverglad.com/app-show-impression4';
+  var params = {
+    'app': 'dmv',
+    'push_id': message.data['id'],
+    'msg_id': message.messageId
+  };
+  print('=============sentImpression');
   print(message);
+  try {
+    var res = await http.post(Uri.parse(url),
+        headers: {"Content-Type": "application/json"},
+        // headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+        // headers: {"Accept": "application/json"},
+        body: json.encode(params),
+        encoding: Encoding.getByName("utf-8"));
+    if (res.statusCode == 200) {
+      var body = json.decode(res.body);
+      print(body);
+    }
+  } catch (error) {
+    print(error);
+  }
 }
 
 class MyApp extends StatelessWidget {
@@ -92,9 +116,11 @@ class MyAppContentState extends State<MyAppContent> {
       showNotification(message);
     });
 
+    initializeNotifications();
+
     _testSetCurrentScreen();
-    // _requestNotificationPermission();
-    _getUsetSubscribeInfo();
+    _requestNotificationPermission();
+    // _getUsetSubscribeInfo();
   }
 
   // 屏幕访问
@@ -120,21 +146,24 @@ class MyAppContentState extends State<MyAppContent> {
 
   // 获取用户 id
   Future<void> _getUsetSubscribeInfo() async {
+    // token
+    final fcmToken = await FirebaseMessaging.instance.getToken();
     // 本地信息
     Locale locale = WidgetsBinding.instance!.platformDispatcher.locale;
-
-    final fcmToken = await FirebaseMessaging.instance.getToken();
     final languageCode = locale.languageCode;
     final countryCode = locale.countryCode;
+    // 项目版本
     PackageInfo packageInfo = await PackageInfo.fromPlatform();
     String version = packageInfo.version;
+    // 设备信息
     DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
     AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
+    String phoneInfo =
+        '${androidInfo.brand},${androidInfo.model},${androidInfo.manufacturer},${androidInfo.device},${androidInfo.version.release}';
+    // 时差
     DateTime now = DateTime.now();
     Duration timeZoneOffset = now.timeZoneOffset;
     String timeZoneOffsetString = formatTimeZoneOffset(timeZoneOffset);
-
-    print('------------------');
     // print(fcmToken);
     // print(languageCode);
     // print(countryCode);
@@ -147,52 +176,147 @@ class MyAppContentState extends State<MyAppContent> {
     // print(androidInfo.version.release);
     // print(androidInfo.isPhysicalDevice);
     // print(timeZoneOffsetString);
-    String phoneInfo =
-        '${androidInfo.brand},${androidInfo.model},${androidInfo.manufacturer},${androidInfo.device},${androidInfo.version.release}';
+    // 订阅主题
+    await FirebaseMessaging.instance.subscribeToTopic("all_user");
 
-    String url = 'https://push.silversiri.com/getAppSubscribe';
-    // var params = {
-    //   'app': 'tb',
-    //   'token': fcmToken,
-    //   'lang': languageCode,
-    //   'country': countryCode,
-    //   'version': packageInfo.version,
-    //   'phone_info': phoneInfo,
-    //   'time_zone': timeZoneOffsetString
-    // };
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String uid = prefs.getString('uid') ?? '';
     if (uid == '') {
-      // if (uid == '') {
-      //   String result = await sendSubscribe(fcmToken, languageCode, countryCode,
-      //       packageInfo.version, phoneInfo, timeZoneOffsetString);
-      //   await prefs.setString('uid', result);
-      // }
+      String resultUid = await sendSubscribe(fcmToken, languageCode,
+          countryCode, packageInfo.version, phoneInfo, timeZoneOffsetString);
+      await prefs.setString('uid', resultUid);
     }
   }
 
+  Future<String> sendSubscribe(fcmToken, languageCode, countryCode, version,
+      phoneInfo, timeZoneOffsetString) async {
+    String url = 'https://push.silversiri.com/getAppSubscribe';
+
+    var params = {
+      'app': 'dmv',
+      'token': fcmToken,
+      'lang': languageCode,
+      'country': countryCode,
+      'version': version,
+      'phone_info': phoneInfo,
+      'time_zone': timeZoneOffsetString
+    };
+    var res = await http.post(Uri.parse(url),
+        headers: {"Content-Type": "application/json"},
+        // headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+        // headers: {"Accept": "application/json"},
+        body: json.encode(params),
+        encoding: Encoding.getByName("utf-8"));
+    print('------------------');
+    print(res.statusCode);
+    print(res.body);
+    if (res.statusCode == 200) {
+      var body = json.decode(res.body);
+      var uid = body['data']['uid'];
+      return uid;
+    } else {
+      return '';
+    }
+
+    // var response =
+    //     await Dio().post('https://push.silversiri.com/getAppSubscribe',
+    //         // options: Options(headers: {
+    //         //   'Content-Type': 'application/json; charset=UTF-8',
+    //         // }),
+    //         data: params);
+  }
+
   // 展示推送
-  Future<void> showNotification(message) async {
-    initializeNotifications();
+  Future<void> showNotification(RemoteMessage message) async {
+    sendImpression(message);
+    RemoteNotification? notification = message.notification;
+
+    Map<String, dynamic> messageMap = {
+      'messageId': message.messageId,
+      'data': message.data,
+    };
+
+    const int notificationId = 0;
+    const String channelName = 'channelName';
+    const String channelDescription = 'channelDescription';
+    String notificationTitle = notification!.title ?? '';
+    String notificationContent = notification.body ?? '';
+
+    AndroidNotificationDetails androidNotificationDetails =
+        const AndroidNotificationDetails(
+      channelName,
+      channelName,
+      channelDescription: channelDescription,
+      importance: Importance.high,
+      priority: Priority.high,
+      ticker: 'ticker',
+      // playSound: true,
+
+      // sound: RawResourceAndroidNotificationSound('notification_sound'),
+    );
+
+    final NotificationDetails notificationDetails =
+        NotificationDetails(android: androidNotificationDetails);
+
+    await flutterLocalNotificationsPlugin.show(
+      notificationId,
+      notificationTitle,
+      notificationContent,
+      notificationDetails,
+      payload: jsonEncode(messageMap),
+    );
   }
 
   // 初始化推送
   Future<void> initializeNotifications() async {
-    // finalandroidInitializationSettings =
-    //     const AndroidInitializationSettings('mipmap/ic_launcher');
-    // initializationSettings = InitializationSettings(
-    //   android: androidInitializationSettings,
-    // );
-    // await flutterLocalNotificationsPlugin.initialize(initializationSettings,
-    //     onDidReceiveNotificationResponse: onDidReceiveNotificationResponse);
+    const AndroidInitializationSettings androidInitializationSettings =
+        AndroidInitializationSettings('mipmap/ic_launcher');
+
+    final InitializationSettings initializationSettings =
+        InitializationSettings(
+      android: androidInitializationSettings,
+    );
+    await flutterLocalNotificationsPlugin.initialize(initializationSettings,
+        onDidReceiveNotificationResponse: onDidReceiveNotificationResponse);
   }
 
-  String formatTimeZoneOffset(Duration offset) {
-    String sign = offset.isNegative ? '-' : '+';
-    int hours = offset.inHours.abs();
-    int minutes = (offset.inMinutes.abs() % 60);
-    return '$sign${hours.toString().padLeft(2, '0')}:${minutes.toString().padLeft(2, '0')}';
+  // 监听前台打开消息
+  Future<void> onDidReceiveNotificationResponse(
+      NotificationResponse response) async {
+    String? payload = response.payload;
+    RemoteMessage message = RemoteMessage.fromMap(jsonDecode(payload ?? ''));
+    sendClick(message); // 后端接口，记录打开人数
+    routePage(message); // 跳转到指定页面
   }
+
+  Future<void> sendClick(RemoteMessage message) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String uid = prefs.getString('uid') ?? '';
+    var params = {
+      'app': 'dmv',
+      'u_id': uid,
+      'push_id': message.data['id'],
+      'msg_id': message.messageId
+    };
+
+    String url = 'https://www.silverglad.com/app_click_action4';
+    print('=============sendClick');
+    print(message);
+    try {
+      var res = await http.post(Uri.parse(url),
+          headers: {"Content-Type": "application/json"},
+          body: json.encode(params),
+          encoding: Encoding.getByName("utf-8"));
+      if (res.statusCode == 200) {
+        var body = json.decode(res.body);
+        print(body);
+      }
+    } catch (error) {
+      print(error);
+    }
+  }
+
+  void routePage(RemoteMessage message) {}
 
   // This widget is the root of your application.
   @override
@@ -208,5 +332,34 @@ class MyAppContentState extends State<MyAppContent> {
         },
       ),
     );
+    // return MaterialApp(
+    //   home: Scaffold(
+    //     body: Stack(
+    //       children: [
+    //         InkWell(
+    //             onTap: () {
+    //               _getUsetSubscribeInfo();
+    //             },
+    //             child: Center(
+    //               child: Container(
+    //                 width: 120,
+    //                 height: 40,
+    //                 decoration: BoxDecoration(color: Colors.orange),
+    //                 margin: EdgeInsets.only(top: 120),
+    //                 child: Text('推送测试按钮'),
+    //               ),
+    //             )),
+    //         // StartPage(),
+    //       ],
+    //     ),
+    //   ),
+    // );
   }
+}
+
+String formatTimeZoneOffset(Duration offset) {
+  String sign = offset.isNegative ? '-' : '+';
+  int hours = offset.inHours.abs();
+  int minutes = (offset.inMinutes.abs() % 60);
+  return '$sign${hours.toString().padLeft(2, '0')}:${minutes.toString().padLeft(2, '0')}';
 }

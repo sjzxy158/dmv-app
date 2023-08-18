@@ -90,13 +90,13 @@ class _RoadSignListPageState extends State<RoadSignListPage> {
     licence2 = widget.licence;
     licenceLower2 = widget.licenceLower;
     getRoadSignList();
-    // _testSetCurrentScreen();
+    _testSetCurrentScreen();
   }
 
   Future<void> _testSetCurrentScreen() async {
     await FirebaseAnalytics.instance.setCurrentScreen(
-      screenName: 'RoadSign List',
-      screenClassOverride: 'RoadSign List',
+      screenName: 'Road Sign Tests List',
+      screenClassOverride: 'Road Sign Tests List',
     );
   }
 

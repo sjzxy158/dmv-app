@@ -6,6 +6,8 @@ import 'package:flutter/material.dart';
 
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
 
 import 'package:flutter/foundation.dart';
 import 'package:path_provider/path_provider.dart';
@@ -15,12 +17,16 @@ import 'package:bubble/bubble.dart';
 
 class HandbookPage extends StatefulWidget {
   final String stateAbbr;
+  final String stateValue;
   final String stateSlug;
+  final String licence;
   final String licenceLower;
   const HandbookPage(
       {Key? key,
       required this.stateAbbr,
+      required this.stateValue,
       required this.stateSlug,
+      required this.licence,
       required this.licenceLower})
       : super(key: key);
 
@@ -30,20 +36,14 @@ class HandbookPage extends StatefulWidget {
 
 List HANDBOOK_LIST = [];
 
-class _HandbookPageState extends State<HandbookPage> {
-  @override
-  void initState() {
-    super.initState();
-    stateAbbr = widget.stateAbbr;
-    stateSlug = widget.stateSlug;
-    licenceLower = widget.licenceLower;
-    getTestList();
-  }
-
+class _HandbookPageState extends State<HandbookPage>
+    with AutomaticKeepAliveClientMixin {
   String stateAbbr = '';
+  String stateValue = '';
   String stateSlug = '';
+  String licence = '';
   String licenceLower = '';
-  int _getTestListStatus = -1;
+  int _getHandbookInfoStatus = -1;
   String pageTitle = '';
   int pageNum = 0;
 
@@ -54,12 +54,23 @@ class _HandbookPageState extends State<HandbookPage> {
   bool isInProduction = bool.fromEnvironment("dart.vm.product");
   String Path = '';
   String pdfUrl = "https://cdn.dmv-test-pro.com/handbook/";
-  String downloadUrl =
-      "https://cdn.dmv-test-pro.com/handbook/ca-drivers-handbook.pdf";
+  String downloadUrl = "";
   String fileName = 'sample.pdf';
   String imageUrl = '';
 
-  Future getTestList() async {
+  @override
+  void initState() {
+    super.initState();
+    stateAbbr = widget.stateAbbr;
+    stateValue = widget.stateValue;
+    stateSlug = widget.stateSlug;
+    licence = widget.licence;
+    licenceLower = widget.licenceLower;
+    _getStateAndTypeSelectStatus();
+    _testSetCurrentScreen();
+  }
+
+  Future getHandbookInfo() async {
     setState(() {
       if (isInProduction) {
         Path = 'https://api.dmv-test-pro.com/';
@@ -79,7 +90,7 @@ class _HandbookPageState extends State<HandbookPage> {
         HANDBOOK_LIST = body['data'];
         if (licenceLower == 'car') {
           pageTitle = '$stateAbbr Drivers Handbook';
-        } else if (licenceLower == 'motocycle') {
+        } else if (licenceLower == 'motorcycle') {
           pageTitle = '$stateAbbr Motocycle Handbook';
         } else if (licenceLower == 'cdl') {
           pageTitle = '$stateAbbr CDL Handbook';
@@ -88,7 +99,10 @@ class _HandbookPageState extends State<HandbookPage> {
         downloadUrl = '$pdfUrl${HANDBOOK_LIST[0]['file']}';
         fileName = HANDBOOK_LIST[0]['file'];
         imageUrl = '$pdfUrl${HANDBOOK_LIST[0]['file'].split('.')[0]}.jpg';
-        _getTestListStatus = res.statusCode;
+        print('===================');
+        print(downloadUrl);
+        print(imageUrl);
+        _getHandbookInfoStatus = res.statusCode;
       });
       // _setListStatus(TEST_LIST);
       return body;
@@ -96,6 +110,9 @@ class _HandbookPageState extends State<HandbookPage> {
       return null;
     }
   }
+
+  @override
+  bool get wantKeepAlive => true;
 
   void _downloadPdf() async {
     bool isPermissionReady = await _checkDownloadPermission();
@@ -114,6 +131,7 @@ class _HandbookPageState extends State<HandbookPage> {
           if (total != -1) {
             setState(() {
               currentProgress = received / total;
+              print(currentProgress);
             });
             if (currentProgress == 1) {
               setState(() {
@@ -178,6 +196,13 @@ class _HandbookPageState extends State<HandbookPage> {
     }
   }
 
+  Future<void> _testSetCurrentScreen() async {
+    await FirebaseAnalytics.instance.setCurrentScreen(
+      screenName: '${stateValue} ${licence} Handbook',
+      screenClassOverride: '${stateValue} ${licence} Handbook',
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     double statusBar = MediaQuery.of(context).padding.top;
@@ -223,16 +248,16 @@ class _HandbookPageState extends State<HandbookPage> {
                             children: <Widget>[
                               ClipRRect(
                                   borderRadius: BorderRadius.circular(6),
-                                  child: _getTestListStatus == 200
+                                  child: _getHandbookInfoStatus == 200
                                       ? Container(
-                                          height: 230,
+                                          height: 200,
                                           child: Image.network(
                                             imageUrl,
                                             width: 150,
                                           ),
                                         )
                                       : SizedBox(
-                                          height: 230,
+                                          height: 200,
                                           child: _loadDownloadWidget(),
                                         )),
                               Container(
@@ -398,6 +423,18 @@ class _HandbookPageState extends State<HandbookPage> {
             backgroundColor: Color.fromARGB(255, 37, 93, 217),
             valueColor:
                 AlwaysStoppedAnimation(Color.fromARGB(255, 225, 225, 225))));
+  }
+
+  _getStateAndTypeSelectStatus() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
+      licenceLower = prefs.getString('typeSelectLicenceLower');
+    });
+    print('===================');
+    print(stateAbbr);
+    print(stateSlug);
+    print(licenceLower);
+    getHandbookInfo();
   }
 }
 
