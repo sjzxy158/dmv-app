@@ -8,6 +8,10 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
+
+import '../../ad_helper.dart';
+import '../../http/api.dart';
 
 import 'package:flutter/foundation.dart';
 import 'package:path_provider/path_provider.dart';
@@ -38,6 +42,9 @@ List HANDBOOK_LIST = [];
 
 class _HandbookPageState extends State<HandbookPage>
     with AutomaticKeepAliveClientMixin {
+  NativeAd? _ad;
+  int _adError = 0;
+
   String stateAbbr = '';
   String stateValue = '';
   String stateSlug = '';
@@ -51,12 +58,13 @@ class _HandbookPageState extends State<HandbookPage>
   bool downloading = false;
   bool isShowBubble = false;
 
-  bool isInProduction = bool.fromEnvironment("dart.vm.product");
-  String Path = '';
   String pdfUrl = "https://cdn.dmv-test-pro.com/handbook/";
   String downloadUrl = "";
   String fileName = 'sample.pdf';
   String imageUrl = '';
+
+  bool isInProduction = bool.fromEnvironment("dart.vm.product");
+  String path = '';
 
   @override
   void initState() {
@@ -66,21 +74,49 @@ class _HandbookPageState extends State<HandbookPage>
     stateSlug = widget.stateSlug;
     licence = widget.licence;
     licenceLower = widget.licenceLower;
+
+    NativeAd(
+      adUnitId: AdHelper.nativeAdUnitId,
+      factoryId: 'fullTile',
+      request: AdRequest(),
+      listener: NativeAdListener(
+        onAdLoaded: (ad) {
+          setState(() {
+            _ad = ad as NativeAd;
+          });
+        },
+        onAdFailedToLoad: (ad, error) {
+          // Releases an ad resource when it fails to load
+          ad.dispose();
+          setState(() {
+            _adError = error.code;
+          });
+          debugPrint(
+              'Ad load failed (code=${error.code} message=${error.message})');
+        },
+      ),
+    ).load();
+
     _getStateAndTypeSelectStatus();
     _testSetCurrentScreen();
+  }
+
+  @override
+  void dispose() {
+    _ad?.dispose();
+    super.dispose();
   }
 
   Future getHandbookInfo() async {
     setState(() {
       if (isInProduction) {
-        Path = 'https://api.dmv-test-pro.com/';
+        path = productionApi.getHandbookList;
       } else {
-        Path = 'https://api-dmv.silversiri.com/';
+        path = silversiriApi.getHandbookList;
       }
     });
-    String url = '${Path}getHandbookList';
     var res = await http.post(
-      Uri.parse(url),
+      Uri.parse(path),
       body: {'type': licenceLower, 'state': stateSlug},
     );
     if (res.statusCode == 200) {
@@ -99,9 +135,9 @@ class _HandbookPageState extends State<HandbookPage>
         downloadUrl = '$pdfUrl${HANDBOOK_LIST[0]['file']}';
         fileName = HANDBOOK_LIST[0]['file'];
         imageUrl = '$pdfUrl${HANDBOOK_LIST[0]['file'].split('.')[0]}.jpg';
-        print('===================');
-        print(downloadUrl);
-        print(imageUrl);
+        // print('===================');
+        // print(downloadUrl);
+        // print(imageUrl);
         _getHandbookInfoStatus = res.statusCode;
       });
       // _setListStatus(TEST_LIST);
@@ -224,6 +260,7 @@ class _HandbookPageState extends State<HandbookPage>
                       width: double.infinity,
                       alignment: Alignment.topLeft,
                       padding: EdgeInsets.only(left: 20, right: 20),
+                      margin: EdgeInsets.only(bottom: 8),
                       child: Column(children: <Widget>[
                         Text(
                           pageTitle,
@@ -274,9 +311,18 @@ class _HandbookPageState extends State<HandbookPage>
                             ],
                           ),
                         ),
+                        _ad != null || _adError != 0
+                            ? Container(
+                                // decoration: BoxDecoration(color: Colors.red),
+                                height: 220,
+                                margin: EdgeInsets.fromLTRB(0, 8, 0, 0),
+                                // margin: const EdgeInsets.only(top: 36)
+                                alignment: Alignment.center,
+                                child: AdWidget(ad: _ad!))
+                            : Text(''),
                         Container(
                           width: double.infinity,
-                          margin: EdgeInsets.only(top: 24),
+                          margin: EdgeInsets.only(top: 8),
                           child: Flex(
                               direction: Axis.horizontal,
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -285,7 +331,7 @@ class _HandbookPageState extends State<HandbookPage>
                                     flex: 1,
                                     child: InkWell(
                                       onTap: () {
-                                        print('download');
+                                        // print('download');
                                         _downloadPdf();
                                       },
                                       child: Container(

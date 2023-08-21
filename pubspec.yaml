@@ -33,27 +33,29 @@ dependencies:
   flutter_svg: ^0.22.0
   # flutter_webview_plugin: ^0.4.0
   webview_flutter: ^3.0.0
+  http: ^0.13.0
+  dio: ^5.3.2
+  shared_preferences: ^0.5.1+1
+  bubble: ^1.2.1
+
   google_mobile_ads: ^1.2.0
 
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.2
-  firebase_core: ^1.12.0
-  firebase_analytics: ^9.1.1
 
   # http: ^0.12.0+1
-  http: ^0.13.0
-  dio: ^5.3.2
-  shared_preferences: ^0.5.1+1
-  permission_handler: ^10.2.0
+  
+  firebase_core: ^1.12.0
   firebase_core_platform_interface: 4.5.1
+  firebase_analytics: ^9.1.1
   firebase_messaging: ^13.0.4
+  permission_handler: ^10.2.0
   package_info_plus: ^1.1.0
   device_info_plus: ^3.2.0
   flutter_local_notifications: ^12.0.3
   path_provider: ^2.0.8
-  bubble: ^1.2.1
 
 
 dev_dependencies:
@@ -93,6 +95,7 @@ flutter:
   - images/pic/car/
   - images/pic/motorcycle/
   - images/pic/cdl/
+  - images/signs/
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.

@@ -450,7 +450,7 @@ class _TestDataListState extends State<TestDataList> {
                                   "images/pic/$licenceLower/$licenceLower-${index + 1}.png")),
                         )),
                     Container(
-                      margin: EdgeInsets.only(top: 10),
+                      margin: EdgeInsets.only(top: 8),
                       child: Text(
                         'Practice Test 0${index + 1}',
                         style: TextStyle(
@@ -460,7 +460,6 @@ class _TestDataListState extends State<TestDataList> {
                       ),
                     ),
                     Container(
-                      margin: EdgeInsets.only(top: 2),
                       child: Text(
                         '${TEST_LIST[index]['question_num']} Questions',
                         style: TextStyle(
@@ -523,15 +522,16 @@ class _RoadSignListState extends State<RoadSignList> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
                     Container(
-                      height: 160,
-                      width: 160,
-                      decoration: BoxDecoration(
-                        color: Colors.grey,
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                    ),
+                        height: 160,
+                        width: 160,
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(8),
+                          child: Image(
+                              image: AssetImage(
+                                  "images/signs/sign-${index + 1}.png")),
+                        )),
                     Container(
-                      margin: EdgeInsets.only(top: 10),
+                      margin: EdgeInsets.only(top: 8),
                       child: Text(
                         'Practice Test 0${index + 1}',
                         style: TextStyle(

@@ -31,7 +31,8 @@ Future<void> main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+  // 监听后台接受消息
+  // FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
 
   runApp(const MyApp());
 }
@@ -39,7 +40,8 @@ Future<void> main() async {
 @pragma('vm:entry-point')
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   await Firebase.initializeApp();
-  sendImpression(message); // 后端接口，记录接受消息人数
+  // 后端接口，记录接受消息人数
+  // sendImpression(message);
 }
 
 //  后端接口，记录接受消息人数
@@ -112,8 +114,10 @@ class MyAppContentState extends State<MyAppContent> {
         .addObserver(AppLifecycleReactor(appOpenAdManager: appOpenAdManager));
 
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-      sendImpression(message); // 后端接口，记录接受消息人数
-      showNotification(message);
+      // 后端接口，记录接受消息人数
+      // sendImpression(message);
+      // 展示推送
+      // showNotification(message);
     });
 
     initializeNotifications();
@@ -136,6 +140,8 @@ class MyAppContentState extends State<MyAppContent> {
     //  请求推送授权
     PermissionStatus status = await Permission.notification.request();
     // PermissionStatus status = await Permission.storage.request();
+    print('======================statusisGranted');
+    print(status.isGranted);
     if (status.isGranted) {
       // 用户已授权推送权限
       _getUsetSubscribeInfo();
@@ -182,6 +188,7 @@ class MyAppContentState extends State<MyAppContent> {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String uid = prefs.getString('uid') ?? '';
     if (uid == '') {
+      print('=======================sendSubscribe');
       String resultUid = await sendSubscribe(fcmToken, languageCode,
           countryCode, packageInfo.version, phoneInfo, timeZoneOffsetString);
       await prefs.setString('uid', resultUid);
@@ -285,8 +292,10 @@ class MyAppContentState extends State<MyAppContent> {
       NotificationResponse response) async {
     String? payload = response.payload;
     RemoteMessage message = RemoteMessage.fromMap(jsonDecode(payload ?? ''));
-    sendClick(message); // 后端接口，记录打开人数
-    routePage(message); // 跳转到指定页面
+    // 后端接口，记录打开人数
+    // sendClick(message);
+    // 跳转到指定页面
+    // routePage(message);
   }
 
   Future<void> sendClick(RemoteMessage message) async {

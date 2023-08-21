@@ -4,6 +4,7 @@ import 'dart:io';
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:app/page/type.dart';
+import '../../http/api.dart';
 
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:http/http.dart' as http;
@@ -34,22 +35,20 @@ class _StateListPageState extends State<StateListPage> {
   int _getStateListStatus = -1;
 
   bool isInProduction = bool.fromEnvironment("dart.vm.product");
-  String Path = '';
+  String path = '';
 
   Future getStateList() async {
     print('---------------------');
     print(isInProduction);
     setState(() {
       if (isInProduction) {
-        Path = 'https://api.dmv-test-pro.com/';
+        path = productionApi.getStateList;
       } else {
-        Path = 'https://api-dmv.silversiri.com/';
+        path = silversiriApi.getStateList;
       }
     });
-    print(Path);
-    print('${Path}getStateList');
-    String url = '${Path}getStateList';
-    var res = await http.post(Uri.parse(url));
+    print(path);
+    var res = await http.post(Uri.parse(path));
     if (res.statusCode == 200) {
       var body = json.decode(res.body);
       // print(body['data']);
