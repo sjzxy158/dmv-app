@@ -53,6 +53,8 @@ int licenceIndex = -1;
 String licence = '';
 String licenceLower = '';
 
+String testDetailTitle = '';
+
 class _TestHomePageState extends State<TestHomePage>
     with AutomaticKeepAliveClientMixin {
   int testListLength = 0;
@@ -60,6 +62,7 @@ class _TestHomePageState extends State<TestHomePage>
   int _getTestListStatus = -1;
   int _getRognSignListStatus = -1;
   String homeTitle = 'Hello';
+  String testTitle = 'DMV Practice Tests';
 
   NativeAd? _ad;
   int _adError = 0;
@@ -138,6 +141,15 @@ class _TestHomePageState extends State<TestHomePage>
       } else {
         homeTitle = 'Good Evening';
       }
+      if (licenceIndex == 0) {
+        testTitle = 'DMV Practice Tests';
+        testDetailTitle = '${stateAbbr} DMV Practice Test';
+      } else if (licenceIndex == 1) {
+        testTitle = 'Motorcycle Practice Tests';
+        testDetailTitle = '${stateAbbr} Motorcycle Practice Test';
+      } else if (licenceIndex == 2) {
+        testTitle = 'CDL Practice Tests';
+      }
     });
     cur_type_index = licenceIndex;
     NativeAd(
@@ -171,8 +183,8 @@ class _TestHomePageState extends State<TestHomePage>
 
   Future<void> _testSetCurrentScreen() async {
     await FirebaseAnalytics.instance.setCurrentScreen(
-      screenName: '${stateValue} ${licence} Home',
-      screenClassOverride: '${stateValue} ${licence} Home',
+      screenName: '${stateValue} ${licence} Tests',
+      screenClassOverride: '${stateValue} ${licence} Tests',
     );
   }
 
@@ -200,7 +212,7 @@ class _TestHomePageState extends State<TestHomePage>
                           padding:
                               EdgeInsets.only(top: 32, bottom: 8, left: 20),
                           child: Text(
-                            homeTitle,
+                            stateValue,
                             style: TextStyle(
                                 fontSize: 32,
                                 fontFamily: 'GoogleSans-Bold',
@@ -228,7 +240,7 @@ class _TestHomePageState extends State<TestHomePage>
                                           MainAxisAlignment.spaceBetween,
                                       children: [
                                         Text(
-                                          'DMV Practice Tests',
+                                          testTitle,
                                           style: TextStyle(
                                               fontFamily: 'Gilroy-Bold',
                                               fontSize: 22),
@@ -293,7 +305,7 @@ class _TestHomePageState extends State<TestHomePage>
                                           MainAxisAlignment.spaceBetween,
                                       children: [
                                         Text(
-                                          'Road Sign Test',
+                                          'Road Sign Tests',
                                           style: TextStyle(
                                               fontFamily: 'Gilroy-Bold',
                                               fontSize: 22),
@@ -320,8 +332,6 @@ class _TestHomePageState extends State<TestHomePage>
                                             alignment: Alignment.centerRight,
                                             padding: EdgeInsets.only(
                                                 left: 32, right: 20),
-                                            // decoration: BoxDecoration(
-                                            //     color: Colors.red),
                                             child: SvgPicture.asset(
                                               'images/go.svg',
                                               width: 16,
@@ -421,7 +431,9 @@ class _TestDataListState extends State<TestDataList> {
               licence: licence,
               licenceLower: licenceLower,
               test_index: index + 1,
-              test_title: TEST_LIST[index]['name'],
+              test_title: licenceIndex == 2
+                  ? '${TEST_LIST[index]['name']}'
+                  : '$testDetailTitle ${index + 1}',
               question_num: TEST_LIST[index]['question_num'],
               qualifying_num: TEST_LIST[index]['qualifying_num'],
               percent: TEST_LIST[index]['score_passing'] + '%',
@@ -433,44 +445,84 @@ class _TestDataListState extends State<TestDataList> {
         },
         child: Stack(
           children: [
-            Container(
-                // height: 210,
-                width: 160,
-                margin: EdgeInsets.only(right: 12),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    Container(
-                        height: 160,
-                        width: 160,
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(8),
-                          child: Image(
-                              image: AssetImage(
-                                  "images/pic/$licenceLower/$licenceLower-${index + 1}.png")),
-                        )),
-                    Container(
-                      margin: EdgeInsets.only(top: 8),
-                      child: Text(
-                        'Practice Test 0${index + 1}',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontFamily: 'GoogleSans-Medium',
+            licenceIndex == 2
+                ? Container(
+                    // height: 210,
+                    width: 160,
+                    margin: EdgeInsets.only(right: 12),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        Container(
+                            height: 160,
+                            width: 160,
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(8),
+                              child: Image(
+                                  image: AssetImage(
+                                      "images/pic/$licenceLower/$licenceLower-${index + 1}.png")),
+                            )),
+                        Container(
+                          margin: EdgeInsets.only(top: 8),
+                          child: Text(
+                            TEST_LIST[index]['name'],
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontFamily: 'GoogleSans-Medium',
+                            ),
+                          ),
                         ),
-                      ),
-                    ),
-                    Container(
-                      child: Text(
-                        '${TEST_LIST[index]['question_num']} Questions',
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: Color(0xff999999),
-                          fontFamily: 'GoogleSans-Regular',
+                        Container(
+                          child: Text(
+                            '${TEST_LIST[index]['question_num']} Questions',
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: Color(0xff999999),
+                              fontFamily: 'GoogleSans-Regular',
+                            ),
+                          ),
+                        )
+                      ],
+                    ))
+                : Container(
+                    // height: 210,
+                    width: 160,
+                    margin: EdgeInsets.only(right: 12),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        Container(
+                            height: 160,
+                            width: 160,
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(8),
+                              child: Image(
+                                  image: AssetImage(
+                                      "images/pic/$licenceLower/$licenceLower-${index + 1}.png")),
+                            )),
+                        Container(
+                          margin: EdgeInsets.only(top: 8),
+                          child: Text(
+                            'Practice Test ${index + 1}',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontFamily: 'GoogleSans-Medium',
+                            ),
+                          ),
                         ),
-                      ),
-                    )
-                  ],
-                )),
+                        Container(
+                          child: Text(
+                            '${TEST_LIST[index]['question_num']} Questions',
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: Color(0xff999999),
+                              fontFamily: 'GoogleSans-Regular',
+                            ),
+                          ),
+                        )
+                      ],
+                    ))
           ],
         ));
   }
@@ -504,6 +556,7 @@ class _RoadSignListState extends State<RoadSignList> {
               licenceIndex: licenceIndex,
               licence: licence,
               licenceLower: licenceLower,
+              test_index: index + 1,
               test_title: ROADSIGN_LIST[index]['name'],
               question_num: ROADSIGN_LIST[index]['question_num'],
               qualifying_num: ROADSIGN_LIST[index]['qualifying_num'],
@@ -530,16 +583,27 @@ class _RoadSignListState extends State<RoadSignList> {
                               image: AssetImage(
                                   "images/signs/sign-${index + 1}.png")),
                         )),
-                    Container(
-                      margin: EdgeInsets.only(top: 8),
-                      child: Text(
-                        'Practice Test 0${index + 1}',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontFamily: 'GoogleSans-Medium',
-                        ),
-                      ),
-                    ),
+                    index == 5
+                        ? Container(
+                            margin: EdgeInsets.only(top: 8),
+                            child: Text(
+                              'True-False Test',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontFamily: 'GoogleSans-Medium',
+                              ),
+                            ),
+                          )
+                        : Container(
+                            margin: EdgeInsets.only(top: 8),
+                            child: Text(
+                              'Practice Test ${index + 1}',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontFamily: 'GoogleSans-Medium',
+                              ),
+                            ),
+                          ),
                     Container(
                       child: Text(
                         '${ROADSIGN_LIST[index]['question_num']} Questions',

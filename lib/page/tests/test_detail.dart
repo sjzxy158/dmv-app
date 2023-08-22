@@ -88,7 +88,7 @@ class _TestDetailPageState extends State<TestDetailPage> {
 
     NativeAd(
       adUnitId: AdHelper.nativeAdUnitId,
-      factoryId: 'fullTile',
+      factoryId: 'listTile',
       request: AdRequest(),
       listener: NativeAdListener(
         onAdLoaded: (ad) {
@@ -119,7 +119,7 @@ class _TestDetailPageState extends State<TestDetailPage> {
   Future<void> _testSetCurrentScreen() async {
     String current_title = '';
     if (licenceIndex == 2) {
-      current_title = '$stateValue $licence $test_index';
+      current_title = '$stateValue $licence $test_title';
     } else {
       current_title = '$stateValue $licence Test $test_index';
     }
@@ -191,7 +191,9 @@ class _TestDetailPageState extends State<TestDetailPage> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: <Widget>[
                             Text(
-                              test_title,
+                              licenceIndex == 2
+                                  ? '$stateAbbr $licence $test_title'
+                                  : test_title,
                               style: TextStyle(
                                 fontSize: 24,
                                 fontFamily: 'Gilroy-Bold',
@@ -199,10 +201,9 @@ class _TestDetailPageState extends State<TestDetailPage> {
                             ),
                             Container(
                               width: double.infinity,
-                              height: 240,
+                              height: 220,
                               margin: EdgeInsets.only(top: 16, bottom: 24),
                               decoration: BoxDecoration(
-                                color: Colors.grey,
                                 borderRadius: BorderRadius.circular(8),
                                 image: DecorationImage(
                                   fit: BoxFit.fitWidth,
@@ -223,19 +224,19 @@ class _TestDetailPageState extends State<TestDetailPage> {
                                 16.0,
                                 16.0),
                             _infoItem(
-                                'qualifying',
-                                'Qualifying marks',
-                                qualifying_num.toString(),
-                                0xff38c296,
+                                'warning',
+                                'Mistakes Allowed',
+                                (question_num - qualifying_num).toString(),
+                                0xffe95650,
                                 12.0,
                                 12.0),
                             _infoItem('passing', 'Passing Score', percent,
-                                0xff38c296, 16.0, 16.0),
+                                0xff38c296, 14.0, 14.0),
                             _ad != null || _adError != 0
                                 ? Container(
                                     // decoration: BoxDecoration(color: Colors.red),
-                                    height: 240,
-                                    margin: EdgeInsets.fromLTRB(0, 8, 0, 0),
+                                    height: 80,
+                                    margin: EdgeInsets.fromLTRB(0, 16, 0, 0),
                                     // margin: const EdgeInsets.only(top: 36)
                                     alignment: Alignment.center,
                                     child: AdWidget(ad: _ad!))
@@ -331,7 +332,10 @@ class _TestDetailPageState extends State<TestDetailPage> {
           ),
           Text(
             number,
-            style: TextStyle(fontSize: 16, color: Colors.black),
+            style: TextStyle(
+                fontFamily: 'GoogleSans-Regular',
+                fontSize: 16,
+                color: Colors.black),
           ),
         ],
       ),

@@ -19,6 +19,7 @@ class RoadSignDetailPage extends StatefulWidget {
   final String licence;
   final String licenceLower;
 
+  final int test_index;
   final String test_title;
   final int question_num;
   final int qualifying_num;
@@ -33,6 +34,7 @@ class RoadSignDetailPage extends StatefulWidget {
     required this.licenceIndex,
     required this.licence,
     required this.licenceLower,
+    required this.test_index,
     required this.test_title,
     required this.question_num,
     required this.qualifying_num,
@@ -55,11 +57,13 @@ class _RoadSignDetailPageState extends State<RoadSignDetailPage> {
   int licenceIndex = -1;
   String licence = '';
   String licenceLower = '';
+  int test_index = -1;
   String test_title = '';
   int question_num = -1;
   int qualifying_num = -1;
   String percent = '';
   String select_test_url = '';
+  String select_test_image_url = '';
 
   @override
   void initState() {
@@ -70,23 +74,20 @@ class _RoadSignDetailPageState extends State<RoadSignDetailPage> {
     licenceIndex = widget.licenceIndex;
     licence = widget.licence;
     licenceLower = widget.licenceLower;
+    test_index = widget.test_index;
     test_title = widget.test_title;
     question_num = widget.question_num;
     qualifying_num = widget.qualifying_num;
     percent = widget.percent;
     select_test_url = widget.select_test_url;
 
-    // print(stateIndex);
-    // print(stateAbbr);
-    // print(stateValue);
-    // print(stateSlug);
-    // print(licenceIndex);
-    // print(licence);
-    // print(licenceLower);
+    setState(() {
+      select_test_image_url = "images/signs/sign-${test_index}.png";
+    });
 
     NativeAd(
       adUnitId: AdHelper.nativeAdUnitId,
-      factoryId: 'fullTile',
+      factoryId: 'listTile',
       request: AdRequest(),
       listener: NativeAdListener(
         onAdLoaded: (ad) {
@@ -116,8 +117,8 @@ class _RoadSignDetailPageState extends State<RoadSignDetailPage> {
 
   Future<void> _testSetCurrentScreen() async {
     await FirebaseAnalytics.instance.setCurrentScreen(
-      screenName: '$test_title',
-      screenClassOverride: '$test_title',
+      screenName: 'Road Sign $test_index',
+      screenClassOverride: 'Road Sign $test_index',
     );
   }
 
@@ -191,11 +192,16 @@ class _RoadSignDetailPageState extends State<RoadSignDetailPage> {
                             ),
                             Container(
                               width: double.infinity,
-                              height: 240,
+                              height: 220,
                               margin: EdgeInsets.only(top: 16, bottom: 24),
                               decoration: BoxDecoration(
-                                  color: Colors.grey,
-                                  borderRadius: BorderRadius.circular(8)),
+                                color: Colors.grey,
+                                borderRadius: BorderRadius.circular(8),
+                                image: DecorationImage(
+                                  fit: BoxFit.fitWidth,
+                                  image: AssetImage(select_test_image_url),
+                                ),
+                              ),
                             ),
                             _infoItem(
                                 'questions',
@@ -205,10 +211,10 @@ class _RoadSignDetailPageState extends State<RoadSignDetailPage> {
                                 16.0,
                                 16.0),
                             _infoItem(
-                                'qualifying',
-                                'Qualifying marks',
-                                qualifying_num.toString(),
-                                0xff38c296,
+                                'warning',
+                                'Mistakes Allowed',
+                                (question_num - qualifying_num).toString(),
+                                0xffe95650,
                                 12.0,
                                 12.0),
                             _infoItem('passing', 'Passing Score', percent,
@@ -216,8 +222,8 @@ class _RoadSignDetailPageState extends State<RoadSignDetailPage> {
                             _ad != null || _adError != 0
                                 ? Container(
                                     // decoration: BoxDecoration(color: Colors.red),
-                                    height: 240,
-                                    margin: EdgeInsets.fromLTRB(0, 8, 0, 0),
+                                    height: 80,
+                                    margin: EdgeInsets.fromLTRB(0, 16, 0, 0),
                                     // margin: const EdgeInsets.only(top: 36)
                                     alignment: Alignment.center,
                                     child: AdWidget(ad: _ad!))
@@ -313,7 +319,10 @@ class _RoadSignDetailPageState extends State<RoadSignDetailPage> {
           ),
           Text(
             number,
-            style: TextStyle(fontSize: 16, color: Colors.black),
+            style: TextStyle(
+                fontFamily: 'GoogleSans-Regular',
+                fontSize: 16,
+                color: Colors.black),
           ),
         ],
       ),

@@ -50,10 +50,12 @@ String stateSlug = '';
 int licenceIndex = -1;
 String licence = '';
 String licenceLower = '';
+String testDetailTitle = '';
 
 class _TestListPageState extends State<TestListPage> {
   int testListLength = 0;
   int _getTestListStatus = -1;
+  String testTitle = 'DMV Practice Tests';
 
   NativeAd? _ad;
   int _adError = 0;
@@ -97,6 +99,16 @@ class _TestListPageState extends State<TestListPage> {
     licence = widget.licence;
     licenceLower = widget.licenceLower;
     getTestList();
+
+    if (licenceIndex == 0) {
+      testTitle = 'DMV Practice Tests';
+      testDetailTitle = '${stateAbbr} DMV Practice Test';
+    } else if (licenceIndex == 1) {
+      testTitle = 'Motorcycle Practice Tests';
+      testDetailTitle = '${stateAbbr} Motorcycle Practice Test';
+    } else if (licenceIndex == 2) {
+      testTitle = 'CDL Practice Tests';
+    }
 
     NativeAd(
       adUnitId: AdHelper.nativeAdUnitId,
@@ -175,14 +187,14 @@ class _TestListPageState extends State<TestListPage> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'DMV Practice Tests',
+                      testTitle,
                       style: TextStyle(
                         fontSize: 24,
                         color: Color(0xff333333),
                         fontFamily: 'Gilroy-Bold',
                       ),
                     ),
-                    Text('$testListLength Sets Of Questions',
+                    Text('$testListLength in total',
                         style: TextStyle(
                           fontSize: 16,
                           color: Color(0xff999999),
@@ -204,13 +216,15 @@ class _TestListPageState extends State<TestListPage> {
                       onTap: () {
                         Navigator.pop(context);
                       },
-                      child: Transform.rotate(
-                          angle: math.pi,
-                          child: SvgPicture.asset(
-                            'images/go.svg',
-                            width: 20,
-                            height: 20,
-                          )),
+                      child: Container(
+                          // decoration: BoxDecoration(color: Colors.red),
+                          child: Transform.rotate(
+                              angle: math.pi,
+                              child: SvgPicture.asset(
+                                'images/go.svg',
+                                width: 20,
+                                height: 20,
+                              ))),
                     ),
                     InkWell(
                       onTap: () {
@@ -312,7 +326,9 @@ class _TestDataListState extends State<TestDataList> {
             licence: licence,
             licenceLower: licenceLower,
             test_index: index + 1,
-            test_title: TEST_LIST[index]['name'],
+            test_title: licenceIndex == 2
+                ? '${TEST_LIST[index]['name']}'
+                : '$testDetailTitle ${index + 1}',
             question_num: TEST_LIST[index]['question_num'],
             qualifying_num: TEST_LIST[index]['qualifying_num'],
             percent: TEST_LIST[index]['score_passing'] + '%',
@@ -337,16 +353,28 @@ class _TestDataListState extends State<TestDataList> {
                       "images/pic/$licenceLower/$licenceLower-${index + 1}.png")),
             )),
           ),
-          Container(
-            margin: EdgeInsets.only(top: 10),
-            child: Text(
-              'Practice Test 0${index + 1}',
-              style: TextStyle(
-                fontSize: 16,
-                fontFamily: 'GoogleSans-Medium',
-              ),
-            ),
-          ),
+          licenceIndex == 2
+              ? Container(
+                  margin: EdgeInsets.only(top: 10),
+                  child: Text(
+                    TEST_LIST[index]['name'],
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontFamily: 'GoogleSans-Medium',
+                    ),
+                  ),
+                )
+              : Container(
+                  margin: EdgeInsets.only(top: 10),
+                  child: Text(
+                    'Practice Test ${index + 1}',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontFamily: 'GoogleSans-Medium',
+                    ),
+                  ),
+                ),
           Container(
             child: Text(
               '${TEST_LIST[index]['question_num']} Questions',

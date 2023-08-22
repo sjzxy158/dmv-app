@@ -59,7 +59,7 @@ class _TypeSelectPageState extends State<TypeSelectPage> {
         home: Scaffold(
             appBar: AppBar(
               title: Text(
-                'Select type of Licence',
+                'Select your license type',
                 style: TextStyle(
                     color: Colors.black,
                     fontFamily: 'GoogleSans-Bold',
@@ -93,9 +93,9 @@ class _TypeSelectPageState extends State<TypeSelectPage> {
                   height: double.infinity,
                   decoration: BoxDecoration(color: Colors.white),
                   child: Column(children: <Widget>[
-                    _typeItem('Car', 0, 600),
-                    _typeItem('Motorcycle', 1, 450),
-                    _typeItem('CDL', 2, 2500),
+                    _typeItem('Car', 0),
+                    _typeItem('Motorcycle', 1),
+                    _typeItem('CDL', 2),
                   ]),
                 ),
                 Positioned(
@@ -155,7 +155,7 @@ class _TypeSelectPageState extends State<TypeSelectPage> {
     await prefs.setString('typeSelectLicenceLower', licenceLower);
   }
 
-  _typeItem(String type, int index, int quesNum) {
+  _typeItem(String type, int index) {
     String licenceSlug = type.toLowerCase();
     return InkWell(
       onTap: () {
@@ -202,16 +202,16 @@ class _TypeSelectPageState extends State<TypeSelectPage> {
                           fontFamily: 'GoogleSans-Medium',
                           color: Colors.black),
                     ),
-                    Container(
-                      margin: EdgeInsets.only(top: 8),
-                      child: Text(
-                        '${quesNum} Questions',
-                        style: TextStyle(
-                            fontSize: 14,
-                            fontFamily: 'GoogleSans-Regular',
-                            color: Color(0xff999999)),
-                      ),
-                    )
+                    // Container(
+                    //   margin: EdgeInsets.only(top: 8),
+                    //   child: Text(
+                    //     '${quesNum} Questions',
+                    //     style: TextStyle(
+                    //         fontSize: 14,
+                    //         fontFamily: 'GoogleSans-Regular',
+                    //         color: Color(0xff999999)),
+                    //   ),
+                    // )
                   ],
                 ),
               ),

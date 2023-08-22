@@ -53,7 +53,7 @@ android {
         targetSdkVersion 33
         // versionCode flutterVersionCode.toInteger()
         // versionName flutterVersionName
-        versionCode 14
+        versionCode 16
         versionName "1.0.0"
 
     }

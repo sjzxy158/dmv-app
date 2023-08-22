@@ -127,7 +127,7 @@ class _HandbookPageState extends State<HandbookPage>
         if (licenceLower == 'car') {
           pageTitle = '$stateAbbr Drivers Handbook';
         } else if (licenceLower == 'motorcycle') {
-          pageTitle = '$stateAbbr Motocycle Handbook';
+          pageTitle = '$stateAbbr Motorcycle Handbook';
         } else if (licenceLower == 'cdl') {
           pageTitle = '$stateAbbr CDL Handbook';
         }
@@ -245,7 +245,7 @@ class _HandbookPageState extends State<HandbookPage>
     return Scaffold(
         appBar: AppBar(
           title: Text(''),
-          toolbarHeight: 40,
+          toolbarHeight: 32,
           backgroundColor: Colors.white,
           elevation: 0,
         ),
@@ -269,8 +269,8 @@ class _HandbookPageState extends State<HandbookPage>
                         ),
                         Container(
                           width: double.infinity,
-                          margin: EdgeInsets.only(top: 32),
-                          padding: EdgeInsets.only(bottom: 32),
+                          margin: EdgeInsets.only(top: 16),
+                          padding: EdgeInsets.only(bottom: 16),
                           decoration: BoxDecoration(
                               gradient: LinearGradient(
                                 begin: Alignment(0.0, -1.0),
@@ -298,13 +298,13 @@ class _HandbookPageState extends State<HandbookPage>
                                           child: _loadDownloadWidget(),
                                         )),
                               Container(
-                                margin: EdgeInsets.only(top: 24),
+                                margin: EdgeInsets.only(top: 16),
                                 child: Row(
                                   mainAxisAlignment:
                                       MainAxisAlignment.spaceAround,
                                   children: <Widget>[
                                     _pdfInfoItem('Pages', pageNum.toString()),
-                                    _pdfInfoItem('Language', 'ENG'),
+                                    _pdfInfoItem('Language', 'EN'),
                                   ],
                                 ),
                               )
@@ -315,7 +315,7 @@ class _HandbookPageState extends State<HandbookPage>
                             ? Container(
                                 // decoration: BoxDecoration(color: Colors.red),
                                 height: 220,
-                                margin: EdgeInsets.fromLTRB(0, 8, 0, 0),
+                                margin: EdgeInsets.fromLTRB(0, 16, 0, 0),
                                 // margin: const EdgeInsets.only(top: 36)
                                 alignment: Alignment.center,
                                 child: AdWidget(ad: _ad!))
